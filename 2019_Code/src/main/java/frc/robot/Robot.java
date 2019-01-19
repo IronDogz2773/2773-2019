@@ -5,7 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.usfirst.frc.team2773.robot;
+package frc.robot;
+// package org.usfirst.frc.team2773.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Victor;
@@ -32,7 +33,7 @@ public class Robot extends TimedRobot {
 	public Joystick joy2;
 	
 	public double joyY;
-	public double jayz;
+	public double joyZ;
 	public double accel;
 	public double veloY;
 	public double veloZ;
@@ -55,14 +56,14 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		m_chooser.addDefault("Default Auto", kDefaultAuto);
-		m_chooser.addObject("My Auto", kCustomAuto);
+		m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
+		m_chooser.addOption("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
 		joy = new Joystick(1);
 		joy2 = new Joystick(2);
 		
 		joyY = 0;
-		jayz = 0;
+		joyZ = 0;
 		
 		accel = 0.2;
 		
@@ -131,7 +132,7 @@ public class Robot extends TimedRobot {
 	{
 		maxSpeed = joy.getThrottle();
 		joyY = joy.getYChannel();
-		jayz = joy.getZChannel();
+		joyZ = joy.getZChannel();
 		
 		if(Math.abs(joyY) > 0.1 && veloY < maxSpeed)
 			veloY += 0.2 * joyY * accel;
@@ -145,8 +146,8 @@ public class Robot extends TimedRobot {
 		
 		if(joyY > 0.1 || joyY < -0.1)
 			drive.tankDrive(veloY, veloY);
-		else if(Math.abs(jayz) > 0.1)
-			drive.tankDrive(-jayz * 0.5, jayz * 0.5);
+		else if(Math.abs(joyZ) > 0.1)
+			drive.tankDrive(-joyZ * 0.5, joyZ * 0.5);
 		else
 			drive.tankDrive(0, 0);
 	}
