@@ -129,20 +129,23 @@ public class Robot extends TimedRobot {
 	public void drive(double joyY, double joyZ)
 	{
 		// Updates variables from Joystick
-		//maxSpeed = joy.getThrottle();
+		maxSpeed = joyY();
   
     //TODO: ACCELERATION CODE GOES HERE snap
+		if(joyY > 0.2 && veloY <= 1)
+			veloY += maxSpeed * 0.01 + veloY 
 		
 		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
-			drive.tankDrive(joyY, joyY);
+			drive.tankDrive(veloY, veloY);
 		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)
 			drive.tankDrive(joyZ * 0.8, -joyZ * 0.8);
 		else // If no input, no movement
 			drive.tankDrive(0, 0); 
-		System.out.println(joyY);
-		System.out.println(joyZ);
+		//System.out.println(joyY);
+		//System.out.println(joyZ);
 		/*if(joyY > 0.2)
 			drive.tankDrive(joyY, joyY);*/
+		system.out.println(veloY);
 	}
 
 	/**
