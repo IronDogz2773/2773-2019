@@ -125,7 +125,11 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() 
 	{
-		drive();
+    //drive();
+    joyY = joy.getY();
+    joyZ = joy.getZ();
+    System.out.println(joyY + "Y");
+    System.out.println(joyZ + "Z");
 	}
 	
 	public void drive()
