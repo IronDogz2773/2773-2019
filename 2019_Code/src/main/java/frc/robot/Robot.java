@@ -131,7 +131,7 @@ public class Robot extends TimedRobot {
 		// Updates variables from Joystick
 		//maxSpeed = joy.getThrottle();
   
-    //TODO: ACCELERATION CODE GOES HERE
+    //TODO: ACCELERATION CODE GOES HERE snap
 		
 		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
 			drive.tankDrive(joyY, joyY);
