@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot;
-// package org.usfirst.frc.team2773.robot;
+package org.usfirst.frc.team2773.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Victor;
@@ -29,6 +28,7 @@ public class Robot extends TimedRobot {
 	public static final String kCustomAuto = "My Auto";
 	public String m_autoSelected;
 	public SendableChooser<String> m_chooser = new SendableChooser<>();
+	
 	public Joystick joy;
 	public Joystick joy2;
 	
@@ -37,18 +37,17 @@ public class Robot extends TimedRobot {
 	public double accel;
 	public double veloY;
 	public double veloZ;
+	public double maxSpeed;
 	
 	public Victor FL; //Finnifan_Leftson
 	public Victor BL; //Benjamen Leftson
-	public SpeedControllerGroup left = new SpeedControllerGroup(FL, BL);
-	
+	public SpeedControllerGroup left;
 	public Victor FR; //Felix RodrIgeese
 	public Victor BR; //Bobbert Raplhq.q
-	public SpeedControllerGroup right = new SpeedControllerGroup(FR, BR);
+	public SpeedControllerGroup right;
+	public DifferentialDrive drive;
 	
-	public double maxSpeed;
 	
-	DifferentialDrive drive;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -56,29 +55,27 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-		m_chooser.addOption("My Auto", kCustomAuto);
+		m_chooser.addDefault("Default Auto", kDefaultAuto);
+		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
+
 		joy = new Joystick(1);
 		joy2 = new Joystick(2);
-		
 		joyY = 0;
 		joyZ = 0;
 		
 		accel = 0.2;
-		
-		
-		
 		veloY = 0;
 		veloZ = 0;
-		
+		maxSpeed = 0.4;
+
 		FL = new Victor(0);
-		FR = new Victor(0);
+		FR = new Victor(3);
+		BL = new Victor(1);
+		BR = new Victor(2);
 		
-		BL = new Victor(0);
-		BR = new Victor(0);
-		
-		maxSpeed = 1;
+		left = new SpeedControllerGroup(FL, BL);
+		right = new SpeedControllerGroup(FR, BR);
 		
 		drive = new DifferentialDrive(left, right);
 		
@@ -108,16 +105,16 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		switch (m_autoSelected) {
+		/*switch (m_autoSelected) {
 			case kCustomAuto:
 				// Put custom auto code here
 				break;
 			case kDefaultAuto:
 			default:
 				// Put default auto code here
-				break;
-		}
-	}
+				break; 
+		} */
+	} 
 
 	/**
 	 * This function is called periodically during operator control.
@@ -125,31 +122,35 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() 
 	{
-		drive();
+		drive(-joy.getY(), joy.getZ());
 	}
 	
-	public void drive()
+	// Gets input from contoller and moves robot 
+	public void drive(double joyY, double joyZ)
 	{
-		maxSpeed = joy.getThrottle();
-		joyY = joy.getYChannel();
-		joyZ = joy.getZChannel();
+		// Updates variables from Joystick
+		//maxSpeed = joy.getThrottle();
 		
-		if(Math.abs(joyY) > 0.1 && veloY < maxSpeed)
+		/*if(Math.abs(joyY) > 0.2 && Math.abs(veloY) < maxSpeed) // If the joystick is being moved and the robot is below max speed, accelerate
 			veloY += 0.2 * joyY * accel;
-		else if(Math.abs(joyY) <= 0.1 && Math.abs(veloY) > 0.1)
+		else if(Math.abs(joyY) <= 0.2 && Math.abs(veloY) > 0.2) // Joystick is resting, robot is still moving, then negative accelertaion
 			veloY -= 0.4 * accel * -veloY;
-		else
-			veloY = 0;
+		else // If no movement, sets to zero
+			veloY = 0; 
 		
-		if(veloY > maxSpeed)
-			veloY = maxSpeed;
+		if(veloY >= maxSpeed) // Makes sures doesn't exceed max speed
+			veloY = maxSpeed; */
 		
-		if(joyY > 0.1 || joyY < -0.1)
-			drive.tankDrive(veloY, veloY);
-		else if(Math.abs(joyZ) > 0.1)
-			drive.tankDrive(-joyZ * 0.5, joyZ * 0.5);
-		else
-			drive.tankDrive(0, 0);
+		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
+			drive.tankDrive(joyY, joyY);
+		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)
+			drive.tankDrive(joyZ * 0.8, -joyZ * 0.8);
+		else // If no input, no movement
+			drive.tankDrive(0, 0); 
+		System.out.println(joyY);
+		System.out.println(joyZ);
+		/*if(joyY > 0.2)
+			drive.tankDrive(joyY, joyY);*/
 	}
 
 	/**
@@ -158,4 +159,4 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testPeriodic() {
 	}
-}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+}                                  
