@@ -132,8 +132,14 @@ public class Robot extends TimedRobot {
 		maxSpeed = joyY();
   
     //TODO: ACCELERATION CODE GOES HERE snap
-		if(joyY > 0.2 && veloY <= 1)
-			veloY += maxSpeed * 0.01 + veloY 
+		while(joyY > 0.2 && veloY <= 1) {
+      			veloY += maxSpeed * .001 + veloY;
+     			System.out.println(veloY);
+    		}
+    		if(veloY > 1) {
+      			veloY = 1;
+      			System.out.println(veloY);
+    		}
 		
 		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
 			drive.tankDrive(veloY, veloY);
