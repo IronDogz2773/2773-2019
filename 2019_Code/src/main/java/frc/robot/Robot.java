@@ -48,7 +48,9 @@ public class Robot extends TimedRobot {
 	public SpeedControllerGroup right;
 	public DifferentialDrive drive;
 	
-	
+	//Grabber 
+	public Spark GR; //Happy Time
+	public Spark GL; //Turny Turn
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -79,6 +81,9 @@ public class Robot extends TimedRobot {
 		right = new SpeedControllerGroup(FR, BR);
 		
 		drive = new DifferentialDrive(left, right);
+
+		GR = new Spark(4);
+		GL = new Spark(5);
 		
 	}
 
@@ -124,6 +129,7 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() 
 	{
 		drive(-joy.getY(), joy.getZ());
+		grab();
 	}
 	
 	// Gets input from contoller and moves robot 
@@ -153,6 +159,25 @@ public class Robot extends TimedRobot {
 		/*if(joyY > 0.2)
 			drive.tankDrive(joyY, joyY);*/
 		system.out.println(veloY);
+	}
+
+	public void grab()
+	{
+		if(joy.getTrigger())
+		{
+			GR.set(0.5);
+			GL.set(-0.5);
+		}
+		else if(joy.getRawButton(2))
+		{
+			GR.set(-0.5);
+			GL.set(0.5);
+		}
+		else
+		{
+			GR.set(0);
+			GL.set(0);
+		}
 	}
 
 	/**
