@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot;
-// package org.usfirst.frc.team2773.robot;
+package org.usfirst.frc.team2773.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Victor;
@@ -17,6 +16,7 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.Spark;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -29,6 +29,7 @@ public class Robot extends TimedRobot {
 	public static final String kCustomAuto = "My Auto";
 	public String m_autoSelected;
 	public SendableChooser<String> m_chooser = new SendableChooser<>();
+	
 	public Joystick joy;
 	public Joystick joy2;
 	
@@ -37,18 +38,21 @@ public class Robot extends TimedRobot {
 	public double accel;
 	public double veloY;
 	public double veloZ;
+	public double trackLeft;
+	public double trackRight;
+	public double maxSpeed;
 	
 	public Victor FL; //Finnifan_Leftson
 	public Victor BL; //Benjamen Leftson
-	public SpeedControllerGroup left = new SpeedControllerGroup(FL, BL);
-	
+	public SpeedControllerGroup left;
 	public Victor FR; //Felix RodrIgeese
 	public Victor BR; //Bobbert Raplhq.q
-	public SpeedControllerGroup right = new SpeedControllerGroup(FR, BR);
+	public SpeedControllerGroup right;
+	public DifferentialDrive drive;
 	
-	public double maxSpeed;
-	
-	DifferentialDrive drive;
+	//Grabber 
+	public Spark GR; //Happy Time
+	public Spark GL; //Turny Turn
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -56,31 +60,34 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-		m_chooser.addOption("My Auto", kCustomAuto);
+		m_chooser.addDefault("Default Auto", kDefaultAuto);
+		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
+
 		joy = new Joystick(1);
 		joy2 = new Joystick(2);
-		
 		joyY = 0;
 		joyZ = 0;
 		
 		accel = 0.2;
-		
-		
-		
 		veloY = 0;
 		veloZ = 0;
-		
+		trackLeft = 0;
+		trackRight = 0;
+		maxSpeed = 0.4;
+
 		FL = new Victor(0);
-		FR = new Victor(0);
+		FR = new Victor(3);
+		BL = new Victor(1);
+		BR = new Victor(2);
 		
-		BL = new Victor(0);
-		BR = new Victor(0);
-		
-		maxSpeed = 1;
+		left = new SpeedControllerGroup(FL, BL);
+		right = new SpeedControllerGroup(FR, BR);
 		
 		drive = new DifferentialDrive(left, right);
+
+		GR = new Spark(4);
+		GL = new Spark(5);
 		
 	}
 
@@ -108,16 +115,16 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		switch (m_autoSelected) {
+		/*switch (m_autoSelected) {
 			case kCustomAuto:
 				// Put custom auto code here
 				break;
 			case kDefaultAuto:
 			default:
 				// Put default auto code here
-				break;
-		}
-	}
+				break; 
+		} */
+	} 
 
 	/**
 	 * This function is called periodically during operator control.
@@ -125,35 +132,49 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() 
 	{
-    //drive();
-    joyY = joy.getY();
-    joyZ = joy.getZ();
-    System.out.println(joyY + "Y");
-    System.out.println(joyZ + "Z");
+		drive(-joy.getY(), joy.getZ());
+		grab();
 	}
 	
-	public void drive()
+	// Gets input from contoller and moves robot 
+	public void drive(double joyY, double joyZ)
 	{
-		maxSpeed = joy.getThrottle();
-		joyY = joy.getYChannel();
-		joyZ = joy.getZChannel();
-		
-		if(Math.abs(joyY) > 0.1 && veloY < maxSpeed)
-			veloY += 0.2 * joyY * accel;
-		else if(Math.abs(joyY) <= 0.1 && Math.abs(veloY) > 0.1)
-			veloY -= 0.4 * accel * -veloY;
+		if(Math.abs(joyY) > 0.2)
+		{
+			trackLeft = joyY;
+			trackRight = joyY;
+		}
+		if(Math.abs(joyZ) > 0.2 )
+		{
+			if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )
+			{
+				trackLeft = trackLeft - joyZ;
+			}
+			if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )
+			{
+				trackRight = trackRight + joyZ;
+			}
+		}
+		drive.tankDrive(trackLeft, trackRight);
+	}
+
+	public void grab()
+	{
+		if(joy.getTrigger())
+		{
+			GR.set(0.5);
+			GL.set(-0.5);
+		}
+		else if(joy.getRawButton(2))
+		{
+			GR.set(-0.5);
+			GL.set(0.5);
+		}
 		else
-			veloY = 0;
-		
-		if(veloY > maxSpeed)
-			veloY = maxSpeed;
-		
-		if(joyY > 0.1 || joyY < -0.1)
-			drive.tankDrive(veloY, veloY);
-		else if(Math.abs(joyZ) > 0.1)
-			drive.tankDrive(-joyZ * 0.5, joyZ * 0.5);
-		else
-			drive.tankDrive(0, 0);
+		{
+			GR.set(0);
+			GL.set(0);
+		}
 	}
 
 	/**
@@ -162,4 +183,32 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testPeriodic() {
 	}
-}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+}                   
+
+                                                  /*:-                          
+                                                 /hdms                          
+                                                `ommmh.                          
+                                               `+mmmd/os+-`                      
+                                             `:ohmmmmdmmmmmhs/                    
+                                    -+oooo/+sdmmmmbmanmmmmmmmd``                  
+             ```...--..```        `+dmyyyhmmmmmmmmmneedsmmmmmmhyy+                
+      ``-/+syhhdmmmmmmmdhyso+++++sydms    hmmmmdmmmmtommmmmmmmmmmd`               
+     /ydmmmmmmmmmmmmmmmmmmmmmmy:./oo/`    .+so/./hmmmstopmmquichem+               
+      -odmmmmmmmjaredmmmmmmmmh`                  .dmmmmmmeatermmmdh               
+     .-`.+hmmmmmmismmmmmmmmmmms                  hmmmmmmmmmdhddy+-`               
+    `odmmdhshmmmmmthemmmmmmmmmd/     `+shys/      odmmmmdy+-` ``                   
+   `ymmmmmkhaimmmmmrealmmmmm:.      `hhailmmy      `-omm-                          
+   smsocksmismmmmmmmmvpmmmmm        :mmthemmm`       -mm:                          
+  `mmmmmmmmmbadmcoltermmmmmmyo/`     ommorbd/     `/oymd.                          
+  -mmmsquidmmmmmwasmmmmyommmmmms      `:+/:`     `dmds+.                           
+  `dmmmtastesmmheremd/`hmmmmmd:                  smm/                             
+   ommmmmmgoodmmmmmdo` `oydmmmh-   ``        ``   /mmo                             
+   :malecmmmmmmmmdo.     ``-+syhsohddh-    +hddy+hmd+`                             
+   :mmisn'tmmmmd+.            ``.-:+hmy-.-:md+oyyy+`                               
+   ommmrealmmh+`                    /mmddddm/  ``                                  
+   `dmmmmmmmy/`                      -josephd                                       
+   +mmmmmds-`                         ydunlap                                       
+  .dmmmh+.                            .herwin`                                      
+ `ymmd/`                               .hmmmmo.                                     
+ommmmh/`                               .smmmmdy/.                                  
+`:::::::.             BEES              `:::::::*/
