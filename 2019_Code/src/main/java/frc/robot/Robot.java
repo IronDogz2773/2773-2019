@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 package org.usfirst.frc.team2773.robot;
+// package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Victor;
@@ -135,18 +136,7 @@ public class Robot extends TimedRobot {
 	// Gets input from contoller and moves robot 
 	public void drive(double joyY, double joyZ)
 	{
-		// Updates variables from Joystick
-		maxSpeed = joyY();
-  
-    //TODO: ACCELERATION CODE GOES HERE snap
-		while(joyY > 0.2 && veloY <= 1) {
-      			veloY += maxSpeed * .001 + veloY;
-     			System.out.println(veloY);
-    		}
-    		if(veloY > 1) {
-      			veloY = 1;
-      			System.out.println(veloY);
-    		}
+		veloY = joyY;
 		
 		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
 			drive.tankDrive(veloY, veloY);
@@ -154,11 +144,6 @@ public class Robot extends TimedRobot {
 			drive.tankDrive(joyZ * 0.8, -joyZ * 0.8);
 		else // If no input, no movement
 			drive.tankDrive(0, 0); 
-		//System.out.println(joyY);
-		//System.out.println(joyZ);
-		/*if(joyY > 0.2)
-			drive.tankDrive(joyY, joyY);*/
-		system.out.println(veloY);
 	}
 
 	public void grab()
