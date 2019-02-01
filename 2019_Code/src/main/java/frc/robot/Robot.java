@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
-/**
+/** // obama
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
  * documentation. If you change the name of this class or the package after
@@ -138,7 +138,7 @@ public class Robot extends TimedRobot {
 	public void drive(double joyY, double joyZ)
 	{
 		veloY = joyY;
-		
+		 
 		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
 			drive.tankDrive(veloY, veloY);
 		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)
