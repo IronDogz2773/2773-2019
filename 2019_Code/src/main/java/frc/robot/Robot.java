@@ -2,10 +2,12 @@
 /* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project.            													  */
+/* IronDogz Team 2773														  */
+/* 2019 Deep Space Code        												  */
+/* v.0.1.1                                        					          */
 /*----------------------------------------------------------------------------*/
 
-//Tyler Graham pushing test
 package org.usfirst.frc.team2773.robot;
 // package frc.robot;
 
@@ -19,6 +21,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -54,6 +59,8 @@ public class Robot extends TimedRobot {
 	public Spark GR; //Happy Time
 	public Spark GL; //Turny Turn
 
+	//Shuffleboard
+	public static final String SFData; //network table
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -132,6 +139,8 @@ public class Robot extends TimedRobot {
 	{
 		drive(-joy.getY(), joy.getZ());
 		grab();
+		//Shuffleboard.update();
+		outputValues();
 	}
 	
 	// Gets input from contoller and moves robot 
@@ -164,6 +173,17 @@ public class Robot extends TimedRobot {
 			GR.set(0);
 			GL.set(0);
 		}
+	}
+
+	/*public void SFSetup()
+	{
+		Shuffleboard.enableActuatorWidgets();
+		Shuffleboard.startRecording();
+	}*/
+
+	public void outputValues()
+	{
+		SmartDashboard.putNumber("Test", 99);
 	}
 
 	/**
