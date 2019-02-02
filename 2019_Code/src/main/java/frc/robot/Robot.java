@@ -9,7 +9,8 @@
 /*----------------------------------------------------------------------------*/
 
 package org.usfirst.frc.team2773.robot;
-// package frc.robot;
+
+ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Victor;
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
+
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
@@ -45,6 +47,9 @@ public class Robot extends TimedRobot {
 	public double accel;
 	public double veloY;
 	public double veloZ;
+
+	public double trackLeft;
+	public double trackRight;
 	public double maxSpeed;
 	
 	public Victor FL; //Finnifan_Leftson
@@ -79,6 +84,10 @@ public class Robot extends TimedRobot {
 		accel = 0.2;
 		veloY = 0;
 		veloZ = 0;
+
+		trackLeft = 0;
+		trackRight = 0;
+
 		maxSpeed = 0.4;
 
 		FL = new Victor(0);
@@ -139,6 +148,32 @@ public class Robot extends TimedRobot {
 	{
 		drive(-joy.getY(), joy.getZ());
 		grab();
+	}
+	
+	public void drive(double joyY, double joyZ)  // takes input from joystick to control robot drivetrain (treads).
+	{
+		if(Math.abs(joyY) > 0.2)                 // If Joy Y input is greater than the deadzone (0.2), add forward velocity.
+		{
+			trackLeft = joyY;
+			trackRight = joyY;
+		}
+		if(Math.abs(joyZ) > 0.2 )				 // If Joy Z input is greater than the deadzone (0.2),
+		{										 // make tracks turn at  different speeds
+			if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )  // This if statement and the following one both make sure that the
+			{											   // input reaching the drive method never goes above 1
+				trackLeft = trackLeft - joyZ;
+			}
+			if(Math.abs(trackRight) + Math.abs(joyZ) < 1 )
+			{
+				trackRight = trackRight + joyZ;
+			}
+		}
+		drive.tankDrive(trackLeft, trackRight);   // Sends the final trackLeft/Right variables to the drive method
+	}
+
+	public void grab()				// Function to control the grabber (duh)
+	{						
+
 		//Shuffleboard.update();
 		outputValues();
 	}
@@ -158,6 +193,7 @@ public class Robot extends TimedRobot {
 
 	public void grab()
 	{
+
 		if(joy.getTrigger())
 		{
 			GR.set(0.5);
@@ -187,6 +223,7 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putNumber("Time", 999);
 		SmartDashboard.putNumber("Left", 999);
 		SmartDashboard.putNumber("Right", 999);
+
 	}
 
 	/**
