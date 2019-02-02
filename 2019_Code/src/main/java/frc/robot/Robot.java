@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
 
-		joy = new Joystick(1);
+		joy = new Joystick(1); //Declaring and assigning default variables
 		joy2 = new Joystick(2);
 		joyY = 0;
 		joyZ = 0;
@@ -135,7 +135,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 
-	public void autonomousPeriodic() {
+	public void autonomousPeriodic() { //all autonomous names
 			if(startChar == "FR1")
 			{
 				close(0, 1);
@@ -190,19 +190,19 @@ public class Robot extends TimedRobot {
 		}
 		drive.tankDrive(0, 0);
 	}
-	public void turn45(int direction) 
+	public void turn45(int direction) //turning 45 degrees
 	{
 		drive.tankDrive(-1 * direction, 1 * direction);
 		//wait(250);
 		drive.tankDrive(0, 0);
 	}
-	public void turn90(int direction) {
+	public void turn90(int direction) { //turning 90 degrees
 		
 		drive.tankDrive(-1 * direction, 1 * direction);
 		//wait(250);
 		drive.tankDrive(0, 0);
 	}
-	public void middle(int turn)
+	public void middle(int turn) 
 	{
 		driveForward(81);
 		turn45(1);
@@ -244,7 +244,7 @@ public class Robot extends TimedRobot {
 	 * This function is called periodically during operator control.
 	 */
 	@Override
-	public void teleopPeriodic() 
+	public void teleopPeriodic()
 	{
 		drive(-joy.getY(), joy.getZ());
 		grab();
@@ -279,9 +279,9 @@ public class Robot extends TimedRobot {
 			drive.tankDrive(joyY, joyY);*/
 	}
 	
-	public void grab()
+	public void grab() //method for controling robot grabber
 	{
-		if(joy.getRawButton(1))
+		if(joy.getRawButton(1)) 
 		{
 			Grabber.set(-0.5);
 			//GL.set(-0.5);
