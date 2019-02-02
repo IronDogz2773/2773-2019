@@ -2,10 +2,15 @@
 /* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project.            													  */
+/* IronDogz Team 2773														  */
+/* 2019 Deep Space Code        												  */
+/* v.0.1.1                                        					          */
 /*----------------------------------------------------------------------------*/
 
 package org.usfirst.frc.team2773.robot;
+
+ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Victor;
@@ -17,6 +22,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
+
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -38,6 +47,7 @@ public class Robot extends TimedRobot {
 	public double accel;
 	public double veloY;
 	public double veloZ;
+
 	public double trackLeft;
 	public double trackRight;
 	public double maxSpeed;
@@ -54,6 +64,8 @@ public class Robot extends TimedRobot {
 	public Spark GR; //Happy Time
 	public Spark GL; //Turny Turn
 
+	//Shuffleboard
+	public static final String SFData; //network table
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -72,8 +84,10 @@ public class Robot extends TimedRobot {
 		accel = 0.2;
 		veloY = 0;
 		veloZ = 0;
+
 		trackLeft = 0;
 		trackRight = 0;
+
 		maxSpeed = 0.4;
 
 		FL = new Victor(0);
@@ -159,6 +173,27 @@ public class Robot extends TimedRobot {
 
 	public void grab()				// Function to control the grabber (duh)
 	{						
+
+		//Shuffleboard.update();
+		outputValues();
+	}
+	
+	// Gets input from contoller and moves robot 
+	public void drive(double joyY, double joyZ)
+	{
+		veloY = joyY;
+		
+		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
+			drive.tankDrive(veloY, veloY);
+		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)
+			drive.tankDrive(joyZ * 0.8, -joyZ * 0.8);
+		else // If no input, no movement
+			drive.tankDrive(0, 0); 
+	}
+
+	public void grab()
+	{
+
 		if(joy.getTrigger())
 		{
 			GR.set(0.5);
@@ -174,6 +209,21 @@ public class Robot extends TimedRobot {
 			GR.set(0);
 			GL.set(0);
 		}
+	}
+
+	/*public void SFSetup()
+	{
+		Shuffleboard.enableActuatorWidgets();
+		Shuffleboard.startRecording();
+	}*/
+
+	public void outputValues()
+	{
+		SmartDashboard.putNumber("Test", Math.PI);
+		SmartDashboard.putNumber("Time", 999);
+		SmartDashboard.putNumber("Left", 999);
+		SmartDashboard.putNumber("Right", 999);
+
 	}
 
 	/**
