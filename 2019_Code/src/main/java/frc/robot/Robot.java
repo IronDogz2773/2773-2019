@@ -7,6 +7,8 @@
 
 package org.usfirst.frc.team2773.robot;
 
+//package frc.robot;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -17,6 +19,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -38,6 +43,9 @@ public class Robot extends TimedRobot {
 	public double accel;
 	public double veloY;
 	public double veloZ;
+
+	public double trackLeft;
+	public double trackRight;
 	public double maxSpeed;
 	
 	public Victor FL; //Finnifan_Leftson
@@ -75,6 +83,10 @@ public class Robot extends TimedRobot {
 		accel = 0.2;
 		veloY = 0;
 		veloZ = 0;
+
+		trackLeft = 0;
+		trackRight = 0;
+
 		maxSpeed = 0.4;
 
 		FL = new Victor(0);
@@ -234,10 +246,10 @@ public class Robot extends TimedRobot {
 	{
 		drive(-joy.getY(), joy.getZ());
 		grab();
+		outputValues();
 	}
 	
-	// Gets input from contoller and moves robot 
-	public void drive(double joyY, double joyZ)
+	public void drive(double joyY, double joyZ)  // takes input from joystick to control robot drivetrain (treads).
 	{
 		// Updates variables from Joystick
 		//maxSpeed = joy.getThrottle();
@@ -281,6 +293,21 @@ public class Robot extends TimedRobot {
 			Grabber.set(0);
 			//GL.set(0);
 		}
+	}
+
+	/*public void SFSetup()
+	{
+		Shuffleboard.enableActuatorWidgets();
+		Shuffleboard.startRecording();
+	}*/
+
+	public void outputValues()
+	{
+		SmartDashboard.putNumber("Test", Math.PI);
+		SmartDashboard.putNumber("Time", 999);
+		SmartDashboard.putNumber("Left", 999);
+		SmartDashboard.putNumber("Right", 999);
+
 	}
 
 	/**
