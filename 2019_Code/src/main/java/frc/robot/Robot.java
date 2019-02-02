@@ -183,7 +183,10 @@ public class Robot extends TimedRobot {
 
 	public void outputValues()
 	{
-		SmartDashboard.putNumber("Test", 99);
+		SmartDashboard.putNumber("Test", Math.PI);
+		SmartDashboard.putNumber("Time", 999);
+		SmartDashboard.putNumber("Left", 999);
+		SmartDashboard.putNumber("Right", 999);
 	}
 
 	/**
