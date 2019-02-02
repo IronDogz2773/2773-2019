@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package org.usfirst.frc.team2773.robot;
+//package org.usfirst.frc.team2773.robot;
 
-//package frc.robot;
+package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -36,6 +36,7 @@ public class Robot extends TimedRobot {
 	public static final String kCustomAuto = "My Auto";
 	public String m_autoSelected;
 	public SendableChooser<String> m_chooser = new SendableChooser<>();
+	public SendableChooser<String> path = new SendableChooser<>();
 	
 	public Joystick joy;
 	public Joystick joy2;
@@ -45,9 +46,6 @@ public class Robot extends TimedRobot {
 	public double accel;
 	public double veloY;
 	public double veloZ;
-
-	public double trackLeft;
-	public double trackRight;
 	public double maxSpeed;
 	
 	public Victor FL; //Finnifan_Leftson
@@ -76,6 +74,16 @@ public class Robot extends TimedRobot {
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
+		
+		path.setDefaultOption("FR1", "FR1");
+		path.addOption("FR2", "FR2");
+		path.addOption("BR1", "BR2");
+		path.addOption("BR2", "BR2");
+		path.addOption("FL1", "FL1");
+		path.addOption("FL2", "FL2");
+		path.addOption("FM1", "FM1");
+		path.addOption("FM2", "FM2");
+		SmartDashboard.putData("Path Choices", path);
 
 		joy = new Joystick(1);
 		joy2 = new Joystick(2);
@@ -85,10 +93,6 @@ public class Robot extends TimedRobot {
 		accel = 0.2;
 		veloY = 0;
 		veloZ = 0;
-
-		trackLeft = 0;
-		trackRight = 0;
-
 		maxSpeed = 0.4;
 
 		FL = new Victor(0);
@@ -108,7 +112,9 @@ public class Robot extends TimedRobot {
 		timer = new Timer();
 		
 		camera = CameraServer.getInstance();
-		camera.startAutomaticCapture().setResolution(1280, 720);
+		camera.startAutomaticCapture(0).setResolution(1280, 720);
+		//camera.setFPS(15);
+		
 	}
 
 	/**
@@ -125,8 +131,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		m_autoSelected = m_chooser.getSelected();
-		// autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
+		startChar = path.getSelected();
+		//autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
 		System.out.println("Auto selected: " + m_autoSelected);
 	}
 
@@ -251,7 +257,8 @@ public class Robot extends TimedRobot {
 		outputValues();
 	}
 	
-	public void drive(double joyY, double joyZ)  // takes input from joystick to control robot drivetrain (treads).
+	// Gets input from contoller and moves robot 
+	public void drive(double joyY, double joyZ)
 	{
 		// Updates variables from Joystick
 		//maxSpeed = joy.getThrottle();
@@ -296,13 +303,7 @@ public class Robot extends TimedRobot {
 			//GL.set(0);
 		}
 	}
-
-	/*public void SFSetup()
-	{
-		Shuffleboard.enableActuatorWidgets();
-		Shuffleboard.startRecording();
-	}*/
-
+	
 	public void outputValues()
 	{
 		SmartDashboard.putNumber("Test", Math.PI);
