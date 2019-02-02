@@ -136,30 +136,29 @@ public class Robot extends TimedRobot {
 		grab();
 	}
 	
-	// Gets input from contoller and moves robot 
-	public void drive(double joyY, double joyZ)
+	public void drive(double joyY, double joyZ)  // takes input from joystick to control robot drivetrain (treads).
 	{
-		if(Math.abs(joyY) > 0.2)
+		if(Math.abs(joyY) > 0.2)                 // If Joy Y input is greater than the deadzone (0.2), add forward velocity.
 		{
 			trackLeft = joyY;
 			trackRight = joyY;
 		}
-		if(Math.abs(joyZ) > 0.2 )
-		{
-			if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )
-			{
+		if(Math.abs(joyZ) > 0.2 )				 // If Joy Z input is greater than the deadzone (0.2),
+		{										 // make tracks turn at  different speeds
+			if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )  // This if statement and the following one both make sure that the
+			{											   // input reaching the drive method never goes above 1
 				trackLeft = trackLeft - joyZ;
 			}
-			if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )
+			if(Math.abs(trackRight) + Math.abs(joyZ) < 1 )
 			{
 				trackRight = trackRight + joyZ;
 			}
 		}
-		drive.tankDrive(trackLeft, trackRight);
+		drive.tankDrive(trackLeft, trackRight);   // Sends the final trackLeft/Right variables to the drive method
 	}
 
-	public void grab()
-	{
+	public void grab()				// Function to control the grabber (duh)
+	{						
 		if(joy.getTrigger())
 		{
 			GR.set(0.5);
