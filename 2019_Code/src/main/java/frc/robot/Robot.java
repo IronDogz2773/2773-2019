@@ -5,20 +5,25 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-//Tyler Graham pushing test
 package org.usfirst.frc.team2773.robot;
-// package frc.robot;
+
+//package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -40,6 +45,9 @@ public class Robot extends TimedRobot {
 	public double accel;
 	public double veloY;
 	public double veloZ;
+
+	public double trackLeft;
+	public double trackRight;
 	public double maxSpeed;
 	
 	public Victor FL; //Finnifan_Leftson
@@ -51,8 +59,13 @@ public class Robot extends TimedRobot {
 	public DifferentialDrive drive;
 	
 	//Grabber 
-	public Spark GR; //Happy Time
-	public Spark GL; //Turny Turn
+	public Spark Grabber; //Happy Time
+	//public Spark GL; //Turny Turn
+	
+	public String startChar;
+	public Timer timer;
+	
+	public CameraServer camera;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -72,6 +85,10 @@ public class Robot extends TimedRobot {
 		accel = 0.2;
 		veloY = 0;
 		veloZ = 0;
+
+		trackLeft = 0;
+		trackRight = 0;
+
 		maxSpeed = 0.4;
 
 		FL = new Victor(0);
@@ -83,10 +100,15 @@ public class Robot extends TimedRobot {
 		right = new SpeedControllerGroup(FR, BR);
 		
 		drive = new DifferentialDrive(left, right);
-
-		GR = new Spark(4);
-		GL = new Spark(5);
 		
+		Grabber = new Spark(4);
+		//GL = new Spark(5);
+		
+		startChar = "A";
+		timer = new Timer();
+		
+		camera = CameraServer.getInstance();
+		camera.startAutomaticCapture().setResolution(1280, 720);
 	}
 
 	/**
@@ -112,18 +134,112 @@ public class Robot extends TimedRobot {
 	 * This function is called periodically during autonomous.
 	 */
 	@Override
-	public void autonomousPeriodic() {
-		/*switch (m_autoSelected) {
-			case kCustomAuto:
-				// Put custom auto code here
-				break;
-			case kDefaultAuto:
-			default:
-				// Put default auto code here
-				break; 
-		} */
-	} 
 
+	public void autonomousPeriodic() {
+			if(startChar == "FR1")
+			{
+				close(0, 1);
+			}
+			else if(startChar == "BR1")
+			{
+				close(48, 1);
+			}
+			else if(startChar == "FL2")
+			{
+				close(0, -1);
+			}
+			else if(startChar == "BL2")
+			{
+				close(48, -1);
+			}
+			else if(startChar == "FR2")
+			{
+				far(0, 1);
+			}
+			else if(startChar == "BR2")
+			{
+				far(48, 1);
+			}
+			else if(startChar == "FL1")
+			{
+				far(0, -1);
+			}
+			else if(startChar == "BL1")
+			{
+				far(48, -1);
+			}
+			else if(startChar == "FM2")
+			{
+				middle(1);
+			}
+			else if(startChar == "FM1")
+			{
+				middle(-1);
+			}
+		} 
+	
+
+
+	public void driveForward(int inches) 
+	{
+		for(int i = 0; i < inches; i++)
+		{
+			if(timer.get() < 1) //time it takes to drive one inch
+				drive.tankDrive(1, 1);
+			 //250 is a placeholder value for how long it takes to drive one inch
+		}
+		drive.tankDrive(0, 0);
+	}
+	public void turn45(int direction) 
+	{
+		drive.tankDrive(-1 * direction, 1 * direction);
+		//wait(250);
+		drive.tankDrive(0, 0);
+	}
+	public void turn90(int direction) {
+		
+		drive.tankDrive(-1 * direction, 1 * direction);
+		//wait(250);
+		drive.tankDrive(0, 0);
+	}
+	public void middle(int turn)
+	{
+		driveForward(81);
+		turn45(1);
+		driveForward(105);
+		turn45(-1);
+		driveForward(90);
+		turn90(-1);
+		driveForward(27);
+	}
+	public void far(int back, int turn)
+	{
+		driveForward(81 + back);
+		turn90(1);
+		driveForward(45);
+		turn45(-1);
+		turn45(-1);
+		turn45(-1);
+		driveForward(105);
+		turn45(-1);
+		driveForward(90);
+		turn90(-1);
+		driveForward(27);
+		//smash into cargo ship
+	}
+	public void close(int back, int turn)
+	{
+		driveForward(120 + back);
+		turn45(-1);
+		driveForward(48);
+		turn45(1);
+		driveForward(90);
+		turn90(1);
+		driveForward(27);
+		//smash into cargo ship
+		
+	}
+	
 	/**
 	 * This function is called periodically during operator control.
 	 */
@@ -132,38 +248,69 @@ public class Robot extends TimedRobot {
 	{
 		drive(-joy.getY(), joy.getZ());
 		grab();
+		outputValues();
 	}
 	
-	// Gets input from contoller and moves robot 
-	public void drive(double joyY, double joyZ)
+	public void drive(double joyY, double joyZ)  // takes input from joystick to control robot drivetrain (treads).
 	{
-		veloY = joyY;
-		 
+
+		// Updates variables from Joystick
+		//maxSpeed = joy.getThrottle();
+		
+		/*if(Math.abs(joyY) > 0.2 && Math.abs(veloY) < maxSpeed) // If the joystick is being moved and the robot is below max speed, accelerate
+			veloY += 0.2 * joyY * accel;
+		else if(Math.abs(joyY) <= 0.2 && Math.abs(veloY) > 0.2) // Joystick is resting, robot is still moving, then negative accelertaion
+			veloY -= 0.4 * accel * -veloY;
+		else // If no movement, sets to zero
+			veloY = 0; 
+		
+		if(veloY >= maxSpeed) // Makes sures doesn't exceed max speed
+			veloY = maxSpeed; */
+
 		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
-			drive.tankDrive(veloY, veloY);
+			drive.tankDrive(joyY, joyY);
 		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)
 			drive.tankDrive(joyZ * 0.8, -joyZ * 0.8);
 		else // If no input, no movement
 			drive.tankDrive(0, 0); 
+		System.out.println(joyY);
+		System.out.println(joyZ);
+		/*if(joyY > 0.2)
+			drive.tankDrive(joyY, joyY);*/
 	}
-
+	
 	public void grab()
 	{
-		if(joy.getTrigger())
+		if(joy.getRawButton(1))
 		{
-			GR.set(0.5);
-			GL.set(-0.5);
+			Grabber.set(-0.5);
+			//GL.set(-0.5);
 		}
 		else if(joy.getRawButton(2))
 		{
-			GR.set(-0.5);
-			GL.set(0.5);
+			Grabber.set(-1);
+			//GL.set(0.5);
 		}
 		else
 		{
-			GR.set(0);
-			GL.set(0);
+			Grabber.set(0);
+			//GL.set(0);
 		}
+	}
+
+	/*public void SFSetup()
+	{
+		Shuffleboard.enableActuatorWidgets();
+		Shuffleboard.startRecording();
+	}*/
+
+	public void outputValues()
+	{
+		SmartDashboard.putNumber("Test", Math.PI);
+		SmartDashboard.putNumber("Time", 999);
+		SmartDashboard.putNumber("Left", 999);
+		SmartDashboard.putNumber("Right", 999);
+
 	}
 
 	/**
@@ -174,7 +321,7 @@ public class Robot extends TimedRobot {
 	}
 }                   
 
-                                                  /*:-                          
+                                                  /*:                          
                                                  /hdms                          
                                                 `ommmh.                          
                                                `+mmmd/os+-`                      
@@ -188,9 +335,9 @@ public class Robot extends TimedRobot {
     `odmmdhshmmmmmthemmmmmmmmmd/     `+shys/      odmmmmdy+-` ``                   
    `ymmmmmkhaimmmmmrealmmmmm:.      `hhailmmy      `-omm-                          
    smsocksmismmmmmmmmvpmmmmm        :mmthemmm`       -mm:                          
-  `mmmmmmmmmbadmcoltermmmmmmyo/`     ommorbd/     `/oymd.                          
-  -mmmsquidmmmmmwasmmmmyommmmmms      `:+/:`     `dmds+.                           
-  `dmmmtastesmmheremd/`hmmmmmd:                  smm/                             
+  `mmmmmmmmmbadmmmmmmmmmmmmmyo/`     ommorbd/     `/oymd.                          
+  -mmmsquidmmmmmmmmmmmmyommmmmms      `:+/:`     `dmds+.                           
+  `dmmmtastesmmmmmmmd/`hmmmmmd:                  smm/                             
    ommmmmmgoodmmmmmdo` `oydmmmh-   ``        ``   /mmo                             
    :malecmmmmmmmmdo.     ``-+syhsohddh-    +hddy+hmd+`                             
    :mmisn'tmmmmd+.            ``.-:+hmy-.-:md+oyyy+`                               
