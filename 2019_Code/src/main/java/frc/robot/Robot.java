@@ -140,54 +140,6 @@ public class Robot extends TimedRobot {
 	 * This function is called periodically during autonomous.
 	 */
 	@Override
-<<<<<<< HEAD
-
-	public void autonomousPeriodic() {
-			if(startChar == "FR1")
-			{
-				close(0, 1);
-			}
-			else if(startChar == "BR1")
-			{
-				close(48, 1);
-			}
-			else if(startChar == "FL2")
-			{
-				close(0, -1);
-			}
-			else if(startChar == "BL2")
-			{
-				close(48, -1);
-			}
-			else if(startChar == "FR2")
-			{
-				far(0, 1);
-			}
-			else if(startChar == "BR2")
-			{
-				far(48, 1);
-			}
-			else if(startChar == "FL1")
-			{
-				far(0, -1);
-			}
-			else if(startChar == "BL1")
-			{
-				far(48, -1);
-			}
-			else if(startChar == "FM2")
-			{
-				middle(1);
-			}
-			else if(startChar == "FM1")
-			{
-				middle(-1);
-			}
-		} 
-	
-
-
-=======
 
 	public void autonomousPeriodic() { //all autonomous names
 			if(startChar == "FR1")
@@ -234,7 +186,6 @@ public class Robot extends TimedRobot {
 	
 
 
->>>>>>> c399821e17f65732b68d1b1b47fb46edb720fcb6
 	public void driveForward(int inches) 
 	{
 		for(int i = 0; i < inches; i++)
@@ -245,31 +196,19 @@ public class Robot extends TimedRobot {
 		}
 		drive.tankDrive(0, 0);
 	}
-<<<<<<< HEAD
-	public void turn45(int direction) 
-=======
 	public void turn45(int direction) //turning 45 degrees
->>>>>>> c399821e17f65732b68d1b1b47fb46edb720fcb6
 	{
 		drive.tankDrive(-1 * direction, 1 * direction);
 		//wait(250);
 		drive.tankDrive(0, 0);
 	}
-<<<<<<< HEAD
-	public void turn90(int direction) {
-=======
 	public void turn90(int direction) { //turning 90 degrees
->>>>>>> c399821e17f65732b68d1b1b47fb46edb720fcb6
 		
 		drive.tankDrive(-1 * direction, 1 * direction);
 		//wait(250);
 		drive.tankDrive(0, 0);
 	}
-<<<<<<< HEAD
-	public void middle(int turn)
-=======
 	public void middle(int turn) 
->>>>>>> c399821e17f65732b68d1b1b47fb46edb720fcb6
 	{
 		driveForward(81);
 		turn45(1);
@@ -347,15 +286,9 @@ public class Robot extends TimedRobot {
 			drive.tankDrive(joyY, joyY);*/
 	}
 	
-<<<<<<< HEAD
-	public void grab()
-	{
-		if(joy.getRawButton(1))
-=======
 	public void grab() //method for controling robot grabber
 	{
 		if(joy.getRawButton(1)) 
->>>>>>> c399821e17f65732b68d1b1b47fb46edb720fcb6
 		{
 			Grabber.set(-0.5);
 			//GL.set(-0.5);
