@@ -260,6 +260,7 @@ public class Robot extends TimedRobot {
 	// Gets input from contoller and moves robot 
 	public void drive(double joyY, double joyZ)
 	{
+
 		// Updates variables from Joystick
 		//maxSpeed = joy.getThrottle();
 		
@@ -272,7 +273,7 @@ public class Robot extends TimedRobot {
 		
 		if(veloY >= maxSpeed) // Makes sures doesn't exceed max speed
 			veloY = maxSpeed; */
-		
+
 		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
 			drive.tankDrive(joyY, joyY);
 		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)
