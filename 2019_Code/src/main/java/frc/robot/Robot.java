@@ -320,6 +320,18 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testPeriodic() {
 	}
+
+	@Override
+	public void disabledInit() {
+
+		System.out.println("Stick X: " + joy.getZ());
+		System.out.println("Stick Y: " + joy.getY());
+	
+		System.out.println("autonomous target: " + startChar);
+		
+		System.out.println("no idea: " +
+				getClass().getClassLoader().getResource("").getPath());
+	}
 }                   
 
                                                   /*:                          
