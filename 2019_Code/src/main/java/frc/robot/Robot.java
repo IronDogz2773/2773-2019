@@ -10,9 +10,11 @@ package org.usfirst.frc.team2773.robot;
 //package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -105,8 +107,8 @@ public class Robot extends TimedRobot {
 		startChar = "A";
 		timer = new Timer();
 		
-		camera.addCamera(camera);
-		
+		camera = CameraServer.getInstance();
+		camera.startAutomaticCapture().setResolution(1280, 720);
 	}
 
 	/**
@@ -251,6 +253,7 @@ public class Robot extends TimedRobot {
 	
 	public void drive(double joyY, double joyZ)  // takes input from joystick to control robot drivetrain (treads).
 	{
+
 		// Updates variables from Joystick
 		//maxSpeed = joy.getThrottle();
 		
@@ -263,7 +266,7 @@ public class Robot extends TimedRobot {
 		
 		if(veloY >= maxSpeed) // Makes sures doesn't exceed max speed
 			veloY = maxSpeed; */
-		
+
 		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
 			drive.tankDrive(joyY, joyY);
 		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)
