@@ -8,9 +8,9 @@
 /* v.0.1.1                                        					          */
 /*----------------------------------------------------------------------------*/
 
-package org.usfirst.frc.team2773.robot;
+//package org.usfirst.frc.team2773.robot;
 
-//package frc.robot;
+package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Victor;
@@ -65,7 +65,7 @@ public class Robot extends TimedRobot {
 	public Spark GL; //Turny Turn
 
 	//Shuffleboard
-	public static final String SFData; //network table
+	//public static final String SFData; //network table
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -202,8 +202,8 @@ public class Robot extends TimedRobot {
 	{
 		SmartDashboard.putNumber("Test", Math.PI);
 		SmartDashboard.putNumber("Time", 999);
-		SmartDashboard.putNumber("Left", 999);
-		SmartDashboard.putNumber("Right", 999);
+		SmartDashboard.putNumber("Left", trackLeft);
+		SmartDashboard.putNumber("Right", trackRight);
 
 	}
 
