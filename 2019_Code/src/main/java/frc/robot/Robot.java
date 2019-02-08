@@ -59,6 +59,8 @@ public class Robot extends TimedRobot {
 	//Grabber 
 	public Spark Grabber; //Happy Time
 	//public Spark GL; //Turny Turn
+
+	public Spark lift; 
 	
 	public String startChar;
 	public Timer timer;
@@ -107,6 +109,8 @@ public class Robot extends TimedRobot {
 		
 		Grabber = new Spark(4);
 		//GL = new Spark(5);
+
+		lift = new Spark(6); //placeholder value
 		
 		startChar = "A";
 		timer = new Timer();
@@ -297,11 +301,27 @@ public class Robot extends TimedRobot {
 		{
 			Grabber.set(-1);
 			//GL.set(0.5);
-		}
+		} 
 		else
 		{
 			Grabber.set(0);
 			//GL.set(0);
+		}
+	}
+
+	public void lift()
+	{
+		if(joy.getRawButton(12))
+		{
+			lift.set(0.5);
+		}
+		else if(joy.getRawButton(11))
+		{
+			lift.set(-0.5);
+		}
+		else
+		{
+			lift.set(0);
 		}
 	}
 	
