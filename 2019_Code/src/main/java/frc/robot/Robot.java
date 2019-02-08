@@ -2,10 +2,7 @@
 /* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.            													  */
-/* IronDogz Team 2773														  */
-/* 2019 Deep Space Code        												  */
-/* v.0.1.1                                        					          */
+/* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 //package org.usfirst.frc.team2773.robot;
@@ -13,16 +10,17 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
-
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
@@ -32,12 +30,13 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  * documentation. If you change the name of this class or the package after
  * creating this project, you must also update the build.properties file in the
  * project.
- */ 
+ */
 public class Robot extends TimedRobot {
 	public static final String kDefaultAuto = "Default";
 	public static final String kCustomAuto = "My Auto";
 	public String m_autoSelected;
 	public SendableChooser<String> m_chooser = new SendableChooser<>();
+	public SendableChooser<String> path = new SendableChooser<>();
 	
 	public Joystick joy;
 	public Joystick joy2;
@@ -47,9 +46,6 @@ public class Robot extends TimedRobot {
 	public double accel;
 	public double veloY;
 	public double veloZ;
-
-	public double trackLeft;
-	public double trackRight;
 	public double maxSpeed;
 	
 	public Victor FL; //Finnifan_Leftson
@@ -61,11 +57,14 @@ public class Robot extends TimedRobot {
 	public DifferentialDrive drive;
 	
 	//Grabber 
-	public Spark GR; //Happy Time
-	public Spark GL; //Turny Turn
+	public Spark Grabber; //Happy Time
+	//public Spark GL; //Turny Turn
+	
+	public String startChar;
+	public Timer timer;
+	
+	public CameraServer camera;
 
-	//Shuffleboard
-	//public static final String SFData; //network table
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -75,8 +74,18 @@ public class Robot extends TimedRobot {
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
+		
+		path.setDefaultOption("FR1", "FR1");
+		path.addOption("FR2", "FR2");
+		path.addOption("BR1", "BR2");
+		path.addOption("BR2", "BR2");
+		path.addOption("FL1", "FL1");
+		path.addOption("FL2", "FL2");
+		path.addOption("FM1", "FM1");
+		path.addOption("FM2", "FM2");
+		SmartDashboard.putData("Path Choices", path);
 
-		joy = new Joystick(1);
+		joy = new Joystick(1); //Declaring and assigning default variables
 		joy2 = new Joystick(2);
 		joyY = 0;
 		joyZ = 0;
@@ -84,10 +93,6 @@ public class Robot extends TimedRobot {
 		accel = 0.2;
 		veloY = 0;
 		veloZ = 0;
-
-		trackLeft = 0;
-		trackRight = 0;
-
 		maxSpeed = 0.4;
 
 		FL = new Victor(0);
@@ -99,9 +104,16 @@ public class Robot extends TimedRobot {
 		right = new SpeedControllerGroup(FR, BR);
 		
 		drive = new DifferentialDrive(left, right);
-
-		GR = new Spark(4);
-		GL = new Spark(5);
+		
+		Grabber = new Spark(4);
+		//GL = new Spark(5);
+		
+		startChar = "A";
+		timer = new Timer();
+		
+		camera = CameraServer.getInstance();
+		camera.startAutomaticCapture(0).setResolution(1280, 720);
+		//camera.setFPS(15);
 		
 	}
 
@@ -119,79 +131,186 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		m_autoSelected = m_chooser.getSelected();
-		// autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
+		startChar = path.getSelected();
+		//autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
 		System.out.println("Auto selected: " + m_autoSelected);
 	}
 
 	/**
 	 * This function is called periodically during autonomous.
 	 */
+	@Override
 
+	public void autonomousPeriodic() { //all autonomous names
+			if(startChar == "FR1")
+			{
+				close(0, 1);
+			}
+			else if(startChar == "BR1")
+			{
+				close(48, 1);
+			}
+			else if(startChar == "FL2")
+			{
+				close(0, -1);
+			}
+			else if(startChar == "BL2")
+			{
+				close(48, -1);
+			}
+			else if(startChar == "FR2")
+			{
+				far(0, 1);
+			}
+			else if(startChar == "BR2")
+			{
+				far(48, 1);
+			}
+			else if(startChar == "FL1")
+			{
+				far(0, -1);
+			}
+			else if(startChar == "BL1")
+			{
+				far(48, -1);
+			}
+			else if(startChar == "FM2")
+			{
+				middle(1);
+			}
+			else if(startChar == "FM1")
+			{
+				middle(-1);
+			}
+		} 
+	
+
+
+	public void driveForward(int inches) 
+	{
+		for(int i = 0; i < inches; i++)
+		{
+			if(timer.get() < 1) //time it takes to drive one inch
+				drive.tankDrive(1, 1);
+			 //250 is a placeholder value for how long it takes to drive one inch
+		}
+		drive.tankDrive(0, 0);
+	}
+	public void turn45(int direction) //turning 45 degrees
+	{
+		drive.tankDrive(-1 * direction, 1 * direction);
+		//wait(250);
+		drive.tankDrive(0, 0);
+	}
+	public void turn90(int direction) { //turning 90 degrees
+		
+		drive.tankDrive(-1 * direction, 1 * direction);
+		//wait(250);
+		drive.tankDrive(0, 0);
+	}
+	public void middle(int turn) 
+	{
+		driveForward(81);
+		turn45(1);
+		driveForward(105);
+		turn45(-1);
+		driveForward(90);
+		turn90(-1);
+		driveForward(27);
+	}
+	public void far(int back, int turn)
+	{
+		driveForward(81 + back);
+		turn90(1);
+		driveForward(45);
+		turn45(-1);
+		turn45(-1);
+		turn45(-1);
+		driveForward(105);
+		turn45(-1);
+		driveForward(90);
+		turn90(-1);
+		driveForward(27);
+		//smash into cargo ship
+	}
+	public void close(int back, int turn)
+	{
+		driveForward(120 + back);
+		turn45(-1);
+		driveForward(48);
+		turn45(1);
+		driveForward(90);
+		turn90(1);
+		driveForward(27);
+		//smash into cargo ship
+		
+	}
+	
 	/**
 	 * This function is called periodically during operator control.
 	 */
 	@Override
-	public void teleopPeriodic() 
+	public void teleopPeriodic()
 	{
 		drive(-joy.getY(), joy.getZ());
 		grab();
 		outputValues();
 	}
 	
-	public void drive(double joyY, double joyZ)  // takes input from joystick to control robot drivetrain (treads).
+	// Gets input from contoller and moves robot 
+	public void drive(double joyY, double joyZ)
 	{
-		if(Math.abs(joyY) > 0.2)                 // If Joy Y input is greater than the deadzone (0.2), add forward velocity.
-		{
-			trackLeft = joyY;
-			trackRight = joyY;
-		}
-		if(Math.abs(joyZ) > 0.2 )				 // If Joy Z input is greater than the deadzone (0.2),
-		{										 // make tracks turn at  different speeds
-			if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )  // This if statement and the following one both make sure that the
-			{											   // input reaching the drive method never goes above 1
-				trackLeft = trackLeft - joyZ;
-			}
-			if(Math.abs(trackRight) + Math.abs(joyZ) < 1 )
-			{
-				trackRight = trackRight + joyZ;
-			}
-		}
-		drive.tankDrive(trackLeft, trackRight);   // Sends the final trackLeft/Right variables to the drive method
+
+		// Updates variables from Joystick
+		//maxSpeed = joy.getThrottle();
+		
+		/*if(Math.abs(joyY) > 0.2 && Math.abs(veloY) < maxSpeed) // If the joystick is being moved and the robot is below max speed, accelerate
+			veloY += 0.2 * joyY * accel;
+		else if(Math.abs(joyY) <= 0.2 && Math.abs(veloY) > 0.2) // Joystick is resting, robot is still moving, then negative accelertaion
+			veloY -= 0.4 * accel * -veloY;
+		else // If no movement, sets to zero
+			veloY = 0; 
+		
+		if(veloY >= maxSpeed) // Makes sures doesn't exceed max speed
+			veloY = maxSpeed; */
+
+		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
+			drive.tankDrive(joyY, joyY);
+		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)
+			drive.tankDrive(joyZ * 0.8, -joyZ * 0.8);
+		else // If no input, no movement
+			drive.tankDrive(0, 0); 
+		System.out.println(joyY);
+		System.out.println(joyZ);
+		/*if(joyY > 0.2)
+			drive.tankDrive(joyY, joyY);*/
 	}
-
-	public void grab()
+	
+	public void grab() //method for controling robot grabber
 	{
-
-		if(joy.getTrigger())
+		if(joy.getRawButton(1)) 
 		{
-			GR.set(0.5);
-			GL.set(-0.5);
+			Grabber.set(-0.5);
+			//GL.set(-0.5);
 		}
 		else if(joy.getRawButton(2))
 		{
-			GR.set(-0.5);
-			GL.set(0.5);
+			Grabber.set(-1);
+			//GL.set(0.5);
 		}
 		else
 		{
-			GR.set(0);
-			GL.set(0);
+			Grabber.set(0);
+			//GL.set(0);
 		}
 	}
-
-	/*public void SFSetup()
-	{
-		Shuffleboard.enableActuatorWidgets();
-		Shuffleboard.startRecording();
-	}*/
-
+	
 	public void outputValues()
 	{
 		SmartDashboard.putNumber("Test", Math.PI);
 		SmartDashboard.putNumber("Time", 999);
-		SmartDashboard.putNumber("Left", trackLeft);
-		SmartDashboard.putNumber("Right", trackRight);
+		SmartDashboard.putNumber("Left", 999);
+		SmartDashboard.putNumber("Right", 999);
 
 	}
 
@@ -201,9 +320,21 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testPeriodic() {
 	}
+
+	@Override
+	public void disabledInit() {
+
+		System.out.println("Stick X: " + joy.getZ());
+		System.out.println("Stick Y: " + joy.getY());
+	
+		System.out.println("autonomous target: " + startChar);
+		
+		System.out.println("no idea: " +
+				getClass().getClassLoader().getResource("").getPath());
+	}
 }                   
 
-                                                  /*:-                          
+                                                  /*:                          
                                                  /hdms                          
                                                 `ommmh.                          
                                                `+mmmd/os+-`                      
@@ -217,9 +348,9 @@ public class Robot extends TimedRobot {
     `odmmdhshmmmmmthemmmmmmmmmd/     `+shys/      odmmmmdy+-` ``                   
    `ymmmmmkhaimmmmmrealmmmmm:.      `hhailmmy      `-omm-                          
    smsocksmismmmmmmmmvpmmmmm        :mmthemmm`       -mm:                          
-  `mmmmmmmmmbadmcoltermmmmmmyo/`     ommorbd/     `/oymd.                          
-  -mmmsquidmmmmmwasmmmmyommmmmms      `:+/:`     `dmds+.                           
-  `dmmmtastesmmheremd/`hmmmmmd:                  smm/                             
+  `mmmmmmmmmbadmmmmmmmmmmmmmyo/`     ommorbd/     `/oymd.                          
+  -mmmsquidmmmmmmmmmmmmyommmmmms      `:+/:`     `dmds+.                           
+  `dmmmtastesmmmmmmmd/`hmmmmmd:                  smm/                             
    ommmmmmgoodmmmmmdo` `oydmmmh-   ``        ``   /mmo                             
    :malecmmmmmmmmdo.     ``-+syhsohddh-    +hddy+hmd+`                             
    :mmisn'tmmmmd+.            ``.-:+hmy-.-:md+oyyy+`                               
