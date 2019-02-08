@@ -17,8 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -84,6 +82,7 @@ public class Robot extends TimedRobot {
 		path.addOption("FM1", "FM1");
 		path.addOption("FM2", "FM2");
 		SmartDashboard.putData("Path Choices", path);
+		outputValues();
 
 		joy = new Joystick(1); //Declaring and assigning default variables
 		joy2 = new Joystick(2);
@@ -254,7 +253,7 @@ public class Robot extends TimedRobot {
 	{
 		drive(-joy.getY(), joy.getZ());
 		grab();
-		outputValues();
+		//outputValues();
 	}
 	
 	// Gets input from contoller and moves robot 
