@@ -8,9 +8,8 @@
 /* v.0.1.1                                        					          */
 /*----------------------------------------------------------------------------*/
 
-package org.usfirst.frc.team2773.robot;
 
- package frc.robot;
+package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Victor;
@@ -59,13 +58,13 @@ public class Robot extends TimedRobot {
 	public Victor BR; //Bobbert Raplhq.q
 	public SpeedControllerGroup right;
 	public DifferentialDrive drive;
-	
+
 	//Grabber 
 	public Spark GR; //Happy Time
 	public Spark GL; //Turny Turn
 
 	//Shuffleboard
-	public static final String SFData; //network table
+	
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -171,26 +170,6 @@ public class Robot extends TimedRobot {
 		drive.tankDrive(trackLeft, trackRight);   // Sends the final trackLeft/Right variables to the drive method
 	}
 
-	public void grab()				// Function to control the grabber (duh)
-	{						
-
-		//Shuffleboard.update();
-		outputValues();
-	}
-	
-	// Gets input from contoller and moves robot 
-	public void drive(double joyY, double joyZ)
-	{
-		veloY = joyY;
-		
-		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
-			drive.tankDrive(veloY, veloY);
-		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)
-			drive.tankDrive(joyZ * 0.8, -joyZ * 0.8);
-		else // If no input, no movement
-			drive.tankDrive(0, 0); 
-	}
-
 	public void grab()
 	{
 
@@ -230,9 +209,19 @@ public class Robot extends TimedRobot {
 	 * This function is called periodically during test mode.
 	 */
 	@Override
-	public void testPeriodic() {
-	}
-}                   
+	public void testPeriodic() 
+	{
+		long t= System.currentTimeMillis();
+		long end = t+15000;
+		while(System.currentTimeMillis() < end) 
+		{
+			int obama = 0;
+			while(true){
+				System.out.println(obama);
+				obama++;
+			}
+		}
+	}                   
 
                                                   /*:-                          
                                                  /hdms                          
