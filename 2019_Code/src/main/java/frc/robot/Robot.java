@@ -15,7 +15,10 @@ import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -61,6 +64,11 @@ public class Robot extends TimedRobot {
 	//public Spark GL; //Turny Turn
 
 	public Spark lift; 
+
+	DoubleSolenoid solenoid1; 
+	Solenoid solenoid2;
+	Solenoid solenoid3;
+	Compressor comp;
 	
 	public String startChar;
 	public Timer timer;
@@ -111,6 +119,12 @@ public class Robot extends TimedRobot {
 		//GL = new Spark(5);
 
 		lift = new Spark(6); //placeholder value
+
+		//solenoid1 = new DoubleSolenoid(0, 1);
+		solenoid2 = new Solenoid(4);
+		//solenoid3 = new Solenoid(3);
+		comp = new Compressor(0);
+		//comp.start();
 		
 		startChar = "A";
 		timer = new Timer();
@@ -194,7 +208,7 @@ public class Robot extends TimedRobot {
 	{
 		for(int i = 0; i < inches; i++)
 		{
-			if(timer.get() < 1) //time it takes to drive one inch
+			if(timer.get() < 250) //time it takes to drive one inch
 				drive.tankDrive(1, 1);
 			 //250 is a placeholder value for how long it takes to drive one inch
 		}
@@ -334,23 +348,55 @@ public class Robot extends TimedRobot {
 
 	}
 
+	@Override
+	public void testInit() {
+		//resetEncoders();
+		//comp.start();
+	}
 	/**
 	 * This function is called periodically during test mode.
 	 */
 	@Override
 	public void testPeriodic() {
+		//System.out.println(stick.getRawButton(1));
+		if (joy.getRawButton(1)) {
+			//System.out.println("Button Pressed");
+			//solenoid1.set(DoubleSolenoid.Value.kReverse);
+			//solenoid1.set(DoubleSolenoid.Value.kReverse);
+			//solenoid1.set(DoubleSolenoid.Value.kOff);
+			solenoid2.set(true);
+			//solenoid3.set(true);
+			} else {
+				//System.out.println("Button Not Pressed");
+				//solenoid1.set(DoubleSolenoid.Value.kForward);
+				//solenoid1.set(DoubleSolenoid.Value.kOff);
+				solenoid2.set(false);
+				//solenoid3.set(false);	
+			}
+			comp.setClosedLoopControl(true);
+			comp.start();
+			System.out.println(comp.enabled());
+			//System.out.println(comp.getClosedLoopControl());
+			//System.out.println(comp.getCompressorCurrent());
+			/*System.out.println(comp.getCompressorCurrentTooHighFault());
+			System.out.println(comp.getCompressorCurrentTooHighStickyFault());
+			System.out.println(comp.getCompressorNotConnectedFault());
+			System.out.println(comp.getCompressorNotConnectedStickyFault());
+			System.out.println(comp.getCompressorShortedFault());
+			System.out.println(comp.getCompressorShortedStickyFault());*/
+			
 	}
 
 	@Override
 	public void disabledInit() {
 
-		System.out.println("Stick X: " + joy.getZ());
+		/*System.out.println("Stick X: " + joy.getZ());
 		System.out.println("Stick Y: " + joy.getY());
 	
 		System.out.println("autonomous target: " + startChar);
 		
 		System.out.println("no idea: " +
-				getClass().getClassLoader().getResource("").getPath());
+				getClass().getClassLoader().getResource("").getPath());*/
 	}
 }                   
 
