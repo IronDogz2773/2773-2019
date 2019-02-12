@@ -61,12 +61,13 @@ public class Robot extends TimedRobot {
 	public Spark Grabber; //Happy Time
 	//public Spark GL; //Turny Turn
 
-	public Spark lift; 
+	public Spark lift1; 
+	public Spark lift2; 
 
 	DoubleSolenoid solenoid1; 
 	Solenoid solenoid2;
 	Solenoid solenoid3;
-	Compressor comp;
+	//Compressor comp;
 	
 	public String startChar;
 	public Timer timer;
@@ -117,12 +118,13 @@ public class Robot extends TimedRobot {
 		Grabber = new Spark(4);
 		//GL = new Spark(5);
 
-		lift = new Spark(6); //placeholder value
+		lift1 = new Spark(5);
+		lift2 = new Spark(6); //placeholder value
 
 		//solenoid1 = new DoubleSolenoid(0, 1);
-		solenoid2 = new Solenoid(4);
+		solenoid2 = new Solenoid(0);
 		//solenoid3 = new Solenoid(3);
-		comp = new Compressor(0);
+		//comp = new Compressor();
 		//comp.start();
 		
 		startChar = "A";
@@ -271,6 +273,7 @@ public class Robot extends TimedRobot {
 	{
 		drive(-joy.getY(), joy.getZ());
 		grab();
+		lift();
 		//outputValues();
 	}
 	
@@ -294,7 +297,7 @@ public class Robot extends TimedRobot {
 		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
 			drive.tankDrive(joyY, joyY);
 		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)
-			drive.tankDrive(joyZ * 0.8, -joyZ * 0.8);
+			drive.tankDrive(joyZ * 0.6, -joyZ * 0.6);
 		else // If no input, no movement
 			drive.tankDrive(0, 0); 
 		System.out.println(joyY);
@@ -307,7 +310,7 @@ public class Robot extends TimedRobot {
 	{
 		if(joy.getRawButton(1)) 
 		{
-			Grabber.set(-0.5);
+			Grabber.set(-1);
 			//GL.set(-0.5);
 		}
 		else if(joy.getRawButton(2))
@@ -326,15 +329,33 @@ public class Robot extends TimedRobot {
 	{
 		if(joy.getRawButton(12))
 		{
-			lift.set(0.5);
+			lift1.set(-0.8);
+			lift2.set(-1);
+			System.out.println("Button pressed");
 		}
 		else if(joy.getRawButton(11))
 		{
-			lift.set(-0.5);
+			lift1.set(0.5);
+			lift2.set(1);
+			System.out.println("Button pressed");
+		}
+
+		if(joy.getRawButton(9))
+		{
+			lift1.set(1);
+			//lift2.set(1);
+			System.out.println("Button pressed");
+		}
+		else if(joy.getRawButton(10))
+		{
+			lift1.set(-0.5);
+			//lift2.set(-0.5);
+			System.out.println("Button pressed");
 		}
 		else
 		{
-			lift.set(0);
+			lift1.set(0);
+			lift2.set(0);
 		}
 	}
 	
@@ -363,18 +384,18 @@ public class Robot extends TimedRobot {
 			//solenoid1.set(DoubleSolenoid.Value.kReverse);
 			//solenoid1.set(DoubleSolenoid.Value.kReverse);
 			//solenoid1.set(DoubleSolenoid.Value.kOff);
-			solenoid2.set(true);
+			//solenoid2.set(true);
 			//solenoid3.set(true);
 			} else {
 				//System.out.println("Button Not Pressed");
 				//solenoid1.set(DoubleSolenoid.Value.kForward);
 				//solenoid1.set(DoubleSolenoid.Value.kOff);
-				solenoid2.set(false);
+				//solenoid2.set(false);
 				//solenoid3.set(false);	
 			}
-			comp.setClosedLoopControl(true);
-			comp.start();
-			System.out.println(comp.enabled());
+			//comp.setClosedLoopControl(true);
+			//comp.start();
+			//System.out.print(comp.enabled() + " : ");
 			//System.out.println(comp.getClosedLoopControl());
 			//System.out.println(comp.getCompressorCurrent());
 			/*System.out.println(comp.getCompressorCurrentTooHighFault());
@@ -383,8 +404,7 @@ public class Robot extends TimedRobot {
 			System.out.println(comp.getCompressorNotConnectedStickyFault());
 			System.out.println(comp.getCompressorShortedFault());
 			System.out.println(comp.getCompressorShortedStickyFault());*/
-			
-	}
+	} 
 
 	@Override
 	public void disabledInit() {
