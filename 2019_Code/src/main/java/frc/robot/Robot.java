@@ -58,11 +58,11 @@ public class Robot extends TimedRobot {
 	public DifferentialDrive drive;
 	
 	//Grabber 
-	public Spark Grabber; //Happy Time
-	//public Spark GL; //Turny Turn
+	public Spark grabber; //Happy Time
+	//public Spark GL; //Turny Turn 
 
-	public Spark lift1; 
-	public Spark lift2; 
+	public Spark pole;
+	public Spark grabLift;
 
 	DoubleSolenoid solenoid1; 
 	Solenoid solenoid2;
@@ -115,11 +115,14 @@ public class Robot extends TimedRobot {
 		
 		drive = new DifferentialDrive(left, right);
 		
-		Grabber = new Spark(4);
+		grabber = new Spark(4);
+		grabber.setInverted(true);
 		//GL = new Spark(5);
 
-		lift1 = new Spark(5);
-		lift2 = new Spark(6); //placeholder value
+		pole = new Spark(7);
+		pole.setInverted(true);
+		grabLift = new Spark(6);
+		grabLift.setInverted(true);
 
 		//solenoid1 = new DoubleSolenoid(0, 1);
 		solenoid2 = new Solenoid(0);
@@ -296,7 +299,7 @@ public class Robot extends TimedRobot {
 
 		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
 			drive.tankDrive(joyY, joyY);
-		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)
+		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)oyY
 			drive.tankDrive(joyZ * 0.6, -joyZ * 0.6);
 		else // If no input, no movement
 			drive.tankDrive(0, 0); 
@@ -310,52 +313,49 @@ public class Robot extends TimedRobot {
 	{
 		if(joy.getRawButton(1)) 
 		{
-			Grabber.set(-1);
-			//GL.set(-0.5);
+			grabber.set(1);
 		}
 		else if(joy.getRawButton(2))
 		{
-			Grabber.set(-1);
-			//GL.set(0.5);
+			grabber.set(-1);
 		} 
 		else
 		{
-			Grabber.set(0);
+			grabber.set(0);
 			//GL.set(0);
 		}
 	}
 
 	public void lift()
 	{
+		//Brings pole up
 		if(joy.getRawButton(12))
 		{
-			lift1.set(-0.8);
-			lift2.set(-1);
-			System.out.println("Button pressed");
+			pole.set(1);
+			grabLift.set(-0.6);
 		}
+		//Brings both down
 		else if(joy.getRawButton(11))
 		{
-			lift1.set(0.5);
-			lift2.set(1);
-			System.out.println("Button pressed");
+			pole.set(-1);
+			grabLift.set(-1);
 		}
-
-		if(joy.getRawButton(9))
-		{
-			lift1.set(1);
-			//lift2.set(1);
-			System.out.println("Button pressed");
-		}
+		//Brings grabber up
 		else if(joy.getRawButton(10))
 		{
-			lift1.set(-0.5);
-			//lift2.set(-0.5);
-			System.out.println("Button pressed");
+			//pole.set(1);
+			grabLift.set(1);
 		}
-		else
+
+		//Brings pole down and gives slack from grabber
+		else if(joy.getRawButton(9))
 		{
-			lift1.set(0);
-			lift2.set(0);
+			pole.set(-1);
+			grabLift.set(-0.6);
+		}
+		else{
+			pole.set(0);
+			grabLift.set(0);
 		}
 	}
 	
