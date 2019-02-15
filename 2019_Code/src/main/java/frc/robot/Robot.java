@@ -64,8 +64,8 @@ public class Robot extends TimedRobot {
 	public Spark pole;
 	public Spark grabLift;
 
-	DoubleSolenoid solenoid1; 
-	Solenoid solenoid2;
+	DoubleSolenoid doubleSolenoid1; 
+	Solenoid solenoidMain;
 	Solenoid solenoid3;
 	//Compressor comp;
 	
@@ -357,6 +357,10 @@ public class Robot extends TimedRobot {
 			pole.set(0);
 			grabLift.set(0);
 		}
+	}
+	public void toggleSolonoid(){
+		solenoid
+
 	}
 	
 	public void outputValues()
