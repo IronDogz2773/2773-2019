@@ -55,27 +55,11 @@ public class Robot extends TimedRobot {
 	public DifferentialDrive drive;
 	
 	//Grabber 
-<<<<<<< HEAD
-	public Spark grabber; //Happy Time
-	//public Spark GL; //Turny Turn 
-
-	public Spark pole;
-	public Spark grabLift;
-
-	DoubleSolenoid doubleSolenoid1; 
-	Solenoid solenoidMain;
-	Solenoid solenoid3;
-	//Compressor comp;
-	
-	public String startChar;
-	public Timer timer;
-=======
 	public Spark Grabber; //Happy Time
 	//public Spark GL; //Turny Turn
 	
 	public String startChar;
 	public static Timer timer;
->>>>>>> 62f4ff0170f90d61d8381a999828042bcdf39cf4
 	
 	public CameraServer camera;
 
@@ -125,23 +109,9 @@ public class Robot extends TimedRobot {
 		
 		drive = new DifferentialDrive(left, right);
 		
-		grabber = new Spark(4);
-		grabber.setInverted(true);
+		//grabber = new Spark(4);
+		//grabber.setInverted(true);
 		//GL = new Spark(5);
-<<<<<<< HEAD
-
-		pole = new Spark(7);
-		pole.setInverted(true);
-		grabLift = new Spark(6);
-		grabLift.setInverted(true);
-
-		//solenoid1 = new DoubleSolenoid(0, 1);
-		solenoid2 = new Solenoid(0);
-		//solenoid3 = new Solenoid(3);
-		//comp = new Compressor();
-		//comp.start();
-=======
->>>>>>> 62f4ff0170f90d61d8381a999828042bcdf39cf4
 		
 		startChar = "A";
 		timer = new Timer();
@@ -223,8 +193,8 @@ public class Robot extends TimedRobot {
 		} 
 	
 	public void toggleSolenoid(){
-		if(joy.getRawButton(5))
-			solenoidMain.set(!solenoidMain.get());
+		if(joy.getRawButton(5)){}
+		//	solenoidMain.set(!solenoidMain.get());
 	}
 
 	public void driveForward(int inches) 
@@ -295,7 +265,7 @@ public class Robot extends TimedRobot {
 	{
 		drive(-joy.getY(), joy.getZ());
 		grab();
-		lift();
+		// lift();
 		//outputValues();
 	}
 	
@@ -332,61 +302,20 @@ public class Robot extends TimedRobot {
 	{
 		if(joy.getRawButton(1)) 
 		{
-			grabber.set(1);
+		//	grabber.set(1);
 		}
 		else if(joy.getRawButton(2))
 		{
-<<<<<<< HEAD
-			grabber.set(-1);
-		} 
-=======
 			Grabber.set(-1);
 			//GL.set(0.5);
 		}
->>>>>>> 62f4ff0170f90d61d8381a999828042bcdf39cf4
 		else
 		{
-			grabber.set(0);
+			// rabber.set(0);
 			//GL.set(0);
 		}
 	}
 
-<<<<<<< HEAD
-	public void lift()
-	{
-		//Brings pole up
-		if(joy.getRawButton(12))
-		{
-			pole.set(1);
-			grabLift.set(-0.6);
-		}
-		//Brings both down
-		else if(joy.getRawButton(11))
-		{
-			pole.set(-1);
-			grabLift.set(-1);
-		}
-		//Brings grabber up
-		else if(joy.getRawButton(10))
-		{
-			//pole.set(1);
-			grabLift.set(1);
-		}
-
-		//Brings pole down and gives slack from grabber
-		else if(joy.getRawButton(9))
-		{
-			pole.set(-1);
-			grabLift.set(-0.6);
-		}
-		else{
-			pole.set(0);
-			grabLift.set(0);
-		}
-	}
-	
-	
-=======
 	public void allInputs()
 	{
 		for(int i = 0; i < 12; i++)
@@ -399,7 +328,6 @@ public class Robot extends TimedRobot {
 		}
 	}
 	
->>>>>>> 62f4ff0170f90d61d8381a999828042bcdf39cf4
 	public void outputValues()
 	{
 		SmartDashboard.putNumber("Match", Timer.getMatchTime());
@@ -410,50 +338,12 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putBooleanArray("Joystick 2 Values", joy2Vals);
 	}
 
-<<<<<<< HEAD
-	@Override
-	public void testInit() {
-		//resetEncoders();
-		//comp.start();
-	}
-=======
->>>>>>> 62f4ff0170f90d61d8381a999828042bcdf39cf4
 	/**
 	 * This function is called periodically during test mode.
 	 */
 	@Override
 	public void testPeriodic() {
-<<<<<<< HEAD
-		//System.out.println(stick.getRawButton(1));
-		if (joy.getRawButton(1)) {
-			//System.out.println("Button Pressed");
-			//solenoid1.set(DoubleSolenoid.Value.kReverse);
-			//solenoid1.set(DoubleSolenoid.Value.kReverse);
-			//solenoid1.set(DoubleSolenoid.Value.kOff);
-			//solenoid2.set(true);
-			//solenoid3.set(true);
-			} else {
-				//System.out.println("Button Not Pressed");
-				//solenoid1.set(DoubleSolenoid.Value.kForward);
-				//solenoid1.set(DoubleSolenoid.Value.kOff);
-				//solenoid2.set(false);
-				//solenoid3.set(false);	
-			}
-			//comp.setClosedLoopControl(true);
-			//comp.start();
-			//System.out.print(comp.enabled() + " : ");
-			//System.out.println(comp.getClosedLoopControl());
-			//System.out.println(comp.getCompressorCurrent());
-			/*System.out.println(comp.getCompressorCurrentTooHighFault());
-			System.out.println(comp.getCompressorCurrentTooHighStickyFault());
-			System.out.println(comp.getCompressorNotConnectedFault());
-			System.out.println(comp.getCompressorNotConnectedStickyFault());
-			System.out.println(comp.getCompressorShortedFault());
-			System.out.println(comp.getCompressorShortedStickyFault());*/
-	} 
-=======
 	}
->>>>>>> 62f4ff0170f90d61d8381a999828042bcdf39cf4
 
 	@Override
 	public void disabledInit() {
