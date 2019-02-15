@@ -4,21 +4,18 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
- 
-//New package, old package was "org.usfirst.frc.team2773.robot;"
-package frc.robot; 
 
-//Imports
-import edu.wpi.first.wpilibj.TimedRobot; 
+//package org.usfirst.frc.team2773.robot;
+
+package frc.robot;
+
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
@@ -33,29 +30,22 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  * project.
  */
 public class Robot extends TimedRobot {
-
-	//Declaring variables
 	public static final String kDefaultAuto = "Default";
 	public static final String kCustomAuto = "My Auto";
 	public String m_autoSelected;
 	public SendableChooser<String> m_chooser = new SendableChooser<>();
 	public SendableChooser<String> path = new SendableChooser<>();
 	
-	//Joystick variables
 	public Joystick joy;
 	public Joystick joy2;
 	
-	//Joystick input variables
 	public double joyY;
 	public double joyZ;
-
-	//Drive method variables
 	public double accel;
 	public double veloY;
 	public double veloZ;
 	public double maxSpeed;
 	
-	//Motors and motor controller variables
 	public Victor FL; //Finnifan_Leftson
 	public Victor BL; //Benjamen Leftson
 	public SpeedControllerGroup left;
@@ -64,26 +54,17 @@ public class Robot extends TimedRobot {
 	public SpeedControllerGroup right;
 	public DifferentialDrive drive;
 	
-	//Grabber? (looks scuffed right now)
+	//Grabber 
 	public Spark Grabber; //Happy Time
 	//public Spark GL; //Turny Turn
-
-	public Spark lift; 
-
-	//Solenoids and compressor variables
-	DoubleSolenoid solenoid1; 
-	Solenoid solenoid2;
-	Solenoid solenoid3;
-	Compressor comp;
 	
-	//Autonomous code variable
 	public String startChar;
-
-	//Timer variable
-	public Timer timer;
+	public static Timer timer;
 	
-	//Camera variables
 	public CameraServer camera;
+
+	public boolean[] joyVals;
+	public boolean[] joy2Vals;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -91,6 +72,8 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
+		timer.start();
+
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
@@ -106,8 +89,7 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putData("Path Choices", path);
 		outputValues();
 
-		//Declaring and assigning default variables
-		joy = new Joystick(1); 
+		joy = new Joystick(1); //Declaring and assigning default variables
 		joy2 = new Joystick(2);
 		joyY = 0;
 		joyZ = 0;
@@ -129,14 +111,6 @@ public class Robot extends TimedRobot {
 		
 		Grabber = new Spark(4);
 		//GL = new Spark(5);
-
-		lift = new Spark(6); //placeholder value
-
-		//solenoid1 = new DoubleSolenoid(0, 1);
-		solenoid2 = new Solenoid(4);
-		//solenoid3 = new Solenoid(3);
-		comp = new Compressor(0);
-		//comp.start();
 		
 		startChar = "A";
 		timer = new Timer();
@@ -144,6 +118,9 @@ public class Robot extends TimedRobot {
 		camera = CameraServer.getInstance();
 		camera.startAutomaticCapture(0).setResolution(1280, 720);
 		//camera.setFPS(15);
+
+		joyVals = new boolean[12];
+		joy2Vals = new boolean[10];
 		
 	}
 
@@ -171,10 +148,8 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 
-	public void autonomousPeriodic() 
-	{ 
-		//All autonomous codes
-		if(startChar == "FR1")
+	public void autonomousPeriodic() { //all autonomous names
+			if(startChar == "FR1")
 			{
 				close(0, 1);
 			}
@@ -214,7 +189,7 @@ public class Robot extends TimedRobot {
 			{
 				middle(-1);
 			}
-	} 
+		} 
 	
 
 
@@ -222,7 +197,7 @@ public class Robot extends TimedRobot {
 	{
 		for(int i = 0; i < inches; i++)
 		{
-			if(timer.get() < 250) //time it takes to drive one inch
+			if(timer.get() < 1) //time it takes to drive one inch
 				drive.tankDrive(1, 1);
 			 //250 is a placeholder value for how long it takes to drive one inch
 		}
@@ -289,7 +264,7 @@ public class Robot extends TimedRobot {
 		//outputValues();
 	}
 	
-	//The drive method, takes input from Joystick(1) and passes to drive.tankDrive
+	// Gets input from contoller and moves robot 
 	public void drive(double joyY, double joyZ)
 	{
 
@@ -318,8 +293,7 @@ public class Robot extends TimedRobot {
 			drive.tankDrive(joyY, joyY);*/
 	}
 	
-	//The grabber method, gets button presses from Joystick(1) and controls the motors on the grabber.
-	public void grab()
+	public void grab() //method for controling robot grabber
 	{
 		if(joy.getRawButton(1)) 
 		{
@@ -330,7 +304,7 @@ public class Robot extends TimedRobot {
 		{
 			Grabber.set(-1);
 			//GL.set(0.5);
-		} 
+		}
 		else
 		{
 			Grabber.set(0);
@@ -338,84 +312,45 @@ public class Robot extends TimedRobot {
 		}
 	}
 
-	//The lifter method, gets button presses from Joystick(1) and controls the motors on the lifter.
-	public void lift()
+	public void allInputs()
 	{
-		if(joy.getRawButton(12))
+		for(int i = 0; i < 12; i++)
 		{
-			lift.set(0.5);
+			joyVals[i] = joy.getRawButton(i + 1);
 		}
-		else if(joy.getRawButton(11))
+		for(int i = 0; i < 10; i++)
 		{
-			lift.set(-0.5);
-		}
-		else
-		{
-			lift.set(0);
+			joy2Vals[i] = joy2.getRawButton(i + 1);
 		}
 	}
 	
-	//This method outputs values for use by SmartDashboard
 	public void outputValues()
 	{
-		SmartDashboard.putNumber("Test", Math.PI);
-		SmartDashboard.putNumber("Time", 999);
-		SmartDashboard.putNumber("Left", 999);
-		SmartDashboard.putNumber("Right", 999);
-
+		SmartDashboard.putNumber("Match", Timer.getMatchTime());
+		SmartDashboard.putNumber("JoyX", joy.getX());
+		SmartDashboard.putNumber("JoyY", joy.getY());
+		SmartDashboard.putNumber("JoyZ", joy.getZ());
+		SmartDashboard.putBooleanArray("Joystick Values", joyVals);
+		SmartDashboard.putBooleanArray("Joystick 2 Values", joy2Vals);
 	}
 
-//==================================Beware traveller! Know that beyond this point lies the testing methods!==================================
-
-	@Override
-	public void testInit() {
-		//resetEncoders();
-		//comp.start();
-	}
 	/**
 	 * This function is called periodically during test mode.
 	 */
 	@Override
 	public void testPeriodic() {
-		//System.out.println(stick.getRawButton(1));
-		if (joy.getRawButton(1)) {
-			//System.out.println("Button Pressed");
-			//solenoid1.set(DoubleSolenoid.Value.kReverse);
-			//solenoid1.set(DoubleSolenoid.Value.kReverse);
-			//solenoid1.set(DoubleSolenoid.Value.kOff);
-			solenoid2.set(true);
-			//solenoid3.set(true);
-			} else {
-				//System.out.println("Button Not Pressed");
-				//solenoid1.set(DoubleSolenoid.Value.kForward);
-				//solenoid1.set(DoubleSolenoid.Value.kOff);
-				solenoid2.set(false);
-				//solenoid3.set(false);	
-			}
-			comp.setClosedLoopControl(true);
-			comp.start();
-			System.out.println(comp.enabled());
-			//System.out.println(comp.getClosedLoopControl());
-			//System.out.println(comp.getCompressorCurrent());
-			/*System.out.println(comp.getCompressorCurrentTooHighFault());
-			System.out.println(comp.getCompressorCurrentTooHighStickyFault());
-			System.out.println(comp.getCompressorNotConnectedFault());
-			System.out.println(comp.getCompressorNotConnectedStickyFault());
-			System.out.println(comp.getCompressorShortedFault());
-			System.out.println(comp.getCompressorShortedStickyFault());*/
-			
 	}
 
 	@Override
 	public void disabledInit() {
 
-		/*System.out.println("Stick X: " + joy.getZ());
+		System.out.println("Stick X: " + joy.getZ());
 		System.out.println("Stick Y: " + joy.getY());
 	
 		System.out.println("autonomous target: " + startChar);
 		
 		System.out.println("no idea: " +
-				getClass().getClassLoader().getResource("").getPath());*/
+				getClass().getClassLoader().getResource("").getPath());
 	}
 }                   
 
