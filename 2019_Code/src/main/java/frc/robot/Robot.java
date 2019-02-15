@@ -46,6 +46,7 @@ public class Robot extends TimedRobot {
 	public double accel;
 	public double veloY;
 	public double veloZ;
+	public double staticTurn;
 
 	public double trackLeft;
 	public double trackRight;
@@ -83,6 +84,7 @@ public class Robot extends TimedRobot {
 		accel = 0.2;
 		veloY = 0;
 		veloZ = 0;
+		staticTurn = 2;
 
 		trackLeft = 0;
 		trackRight = 0;
@@ -160,14 +162,14 @@ public class Robot extends TimedRobot {
 			trackRight = joyY;
 			if(Math.abs(joyZ) > 0.1 )				 // If Joy Z input is greater than the deadzone (0.2),
 			{										 // make tracks turn at  different speeds
-				if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )  // This if statement and the following one both make sure that the
-				{											   // input reaching the drive method never goes above 1
+				//if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )  // This if statement and the following one both make sure that the
+				//{											   // input reaching the drive method never goes above 1
 					trackLeft = trackLeft + joyZ;
-				}
-				if(Math.abs(trackRight) + Math.abs(joyZ) < 1 )
-				{
+				//}
+				//if(Math.abs(trackRight) + Math.abs(joyZ) < 1 )
+				//{
 					trackRight = trackRight - joyZ;
-				}
+				//}
 			}
 		}
 		else if(Math.abs(joyZ) > 0.1 && joyY < 0.2)				 // If Joy Z input is greater than the deadzone (0.2),
@@ -175,12 +177,12 @@ public class Robot extends TimedRobot {
 			if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )  // This if statement and the following one both make sure that the
 			{											   // input reaching the drive method never goes above 1
 				trackLeft = 0;
-				trackLeft = trackLeft + joyZ;
+				trackLeft = trackLeft + joyZ * staticTurn;
 			}
 			if(Math.abs(trackRight) + Math.abs(joyZ) < 1 )
 			{
 				trackRight = 0;
-				trackRight = trackRight - joyZ;
+				trackRight = trackRight - joyZ * staticTurn;
 			}
 		}
 		if(Math.abs(joyY) < 0.2 && Math.abs(joyZ) < 0.1)
