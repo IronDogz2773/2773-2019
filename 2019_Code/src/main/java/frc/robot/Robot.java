@@ -15,10 +15,7 @@ import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
@@ -58,6 +55,7 @@ public class Robot extends TimedRobot {
 	public DifferentialDrive drive;
 	
 	//Grabber 
+<<<<<<< HEAD
 	public Spark grabber; //Happy Time
 	//public Spark GL; //Turny Turn 
 
@@ -71,8 +69,18 @@ public class Robot extends TimedRobot {
 	
 	public String startChar;
 	public Timer timer;
+=======
+	public Spark Grabber; //Happy Time
+	//public Spark GL; //Turny Turn
+	
+	public String startChar;
+	public static Timer timer;
+>>>>>>> 62f4ff0170f90d61d8381a999828042bcdf39cf4
 	
 	public CameraServer camera;
+
+	public boolean[] joyVals;
+	public boolean[] joy2Vals;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -80,6 +88,8 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
+		timer.start();
+
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
@@ -118,6 +128,7 @@ public class Robot extends TimedRobot {
 		grabber = new Spark(4);
 		grabber.setInverted(true);
 		//GL = new Spark(5);
+<<<<<<< HEAD
 
 		pole = new Spark(7);
 		pole.setInverted(true);
@@ -129,6 +140,8 @@ public class Robot extends TimedRobot {
 		//solenoid3 = new Solenoid(3);
 		//comp = new Compressor();
 		//comp.start();
+=======
+>>>>>>> 62f4ff0170f90d61d8381a999828042bcdf39cf4
 		
 		startChar = "A";
 		timer = new Timer();
@@ -136,6 +149,9 @@ public class Robot extends TimedRobot {
 		camera = CameraServer.getInstance();
 		camera.startAutomaticCapture(0).setResolution(1280, 720);
 		//camera.setFPS(15);
+
+		joyVals = new boolean[12];
+		joy2Vals = new boolean[10];
 		
 	}
 
@@ -215,7 +231,7 @@ public class Robot extends TimedRobot {
 	{
 		for(int i = 0; i < inches; i++)
 		{
-			if(timer.get() < 250) //time it takes to drive one inch
+			if(timer.get() < 1) //time it takes to drive one inch
 				drive.tankDrive(1, 1);
 			 //250 is a placeholder value for how long it takes to drive one inch
 		}
@@ -320,8 +336,14 @@ public class Robot extends TimedRobot {
 		}
 		else if(joy.getRawButton(2))
 		{
+<<<<<<< HEAD
 			grabber.set(-1);
 		} 
+=======
+			Grabber.set(-1);
+			//GL.set(0.5);
+		}
+>>>>>>> 62f4ff0170f90d61d8381a999828042bcdf39cf4
 		else
 		{
 			grabber.set(0);
@@ -329,6 +351,7 @@ public class Robot extends TimedRobot {
 		}
 	}
 
+<<<<<<< HEAD
 	public void lift()
 	{
 		//Brings pole up
@@ -363,25 +386,44 @@ public class Robot extends TimedRobot {
 	}
 	
 	
+=======
+	public void allInputs()
+	{
+		for(int i = 0; i < 12; i++)
+		{
+			joyVals[i] = joy.getRawButton(i + 1);
+		}
+		for(int i = 0; i < 10; i++)
+		{
+			joy2Vals[i] = joy2.getRawButton(i + 1);
+		}
+	}
+	
+>>>>>>> 62f4ff0170f90d61d8381a999828042bcdf39cf4
 	public void outputValues()
 	{
-		SmartDashboard.putNumber("Test", Math.PI);
-		SmartDashboard.putNumber("Time", 999);
-		SmartDashboard.putNumber("Left", 999);
-		SmartDashboard.putNumber("Right", 999);
-
+		SmartDashboard.putNumber("Match", Timer.getMatchTime());
+		SmartDashboard.putNumber("JoyX", joy.getX());
+		SmartDashboard.putNumber("JoyY", joy.getY());
+		SmartDashboard.putNumber("JoyZ", joy.getZ());
+		SmartDashboard.putBooleanArray("Joystick Values", joyVals);
+		SmartDashboard.putBooleanArray("Joystick 2 Values", joy2Vals);
 	}
 
+<<<<<<< HEAD
 	@Override
 	public void testInit() {
 		//resetEncoders();
 		//comp.start();
 	}
+=======
+>>>>>>> 62f4ff0170f90d61d8381a999828042bcdf39cf4
 	/**
 	 * This function is called periodically during test mode.
 	 */
 	@Override
 	public void testPeriodic() {
+<<<<<<< HEAD
 		//System.out.println(stick.getRawButton(1));
 		if (joy.getRawButton(1)) {
 			//System.out.println("Button Pressed");
@@ -409,17 +451,20 @@ public class Robot extends TimedRobot {
 			System.out.println(comp.getCompressorShortedFault());
 			System.out.println(comp.getCompressorShortedStickyFault());*/
 	} 
+=======
+	}
+>>>>>>> 62f4ff0170f90d61d8381a999828042bcdf39cf4
 
 	@Override
 	public void disabledInit() {
 
-		/*System.out.println("Stick X: " + joy.getZ());
+		System.out.println("Stick X: " + joy.getZ());
 		System.out.println("Stick Y: " + joy.getY());
 	
 		System.out.println("autonomous target: " + startChar);
 		
 		System.out.println("no idea: " +
-				getClass().getClassLoader().getResource("").getPath());*/
+				getClass().getClassLoader().getResource("").getPath());
 	}
 }                   
 
