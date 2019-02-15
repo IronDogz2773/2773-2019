@@ -206,7 +206,10 @@ public class Robot extends TimedRobot {
 			}
 		} 
 	
-
+	public void toggleSolenoid(){
+		if(joy.getRawButton(5))
+			solenoidMain.set(!solenoidMain.get());
+	}
 
 	public void driveForward(int inches) 
 	{
@@ -358,10 +361,7 @@ public class Robot extends TimedRobot {
 			grabLift.set(0);
 		}
 	}
-	public void toggleSolonoid(){
-		solenoid
-
-	}
+	
 	
 	public void outputValues()
 	{
