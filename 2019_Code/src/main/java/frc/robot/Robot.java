@@ -151,22 +151,45 @@ public class Robot extends TimedRobot {
 	
 	public void drive(double joyY, double joyZ)  // takes input from joystick to control robot drivetrain (treads).
 	{
+		joyZ = joyZ * 0.5;
+		System.out.println( "JoyY: " + joyY);
+		System.out.println( "JoyZ: " + joyZ);
 		if(Math.abs(joyY) > 0.2)                 // If Joy Y input is greater than the deadzone (0.2), add forward velocity.
 		{
 			trackLeft = joyY;
 			trackRight = joyY;
+			if(Math.abs(joyZ) > 0.1 )				 // If Joy Z input is greater than the deadzone (0.2),
+			{										 // make tracks turn at  different speeds
+				if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )  // This if statement and the following one both make sure that the
+				{											   // input reaching the drive method never goes above 1
+					trackLeft = trackLeft + joyZ;
+				}
+				if(Math.abs(trackRight) + Math.abs(joyZ) < 1 )
+				{
+					trackRight = trackRight - joyZ;
+				}
+			}
 		}
-		if(Math.abs(joyZ) > 0.2 )				 // If Joy Z input is greater than the deadzone (0.2),
+		else if(Math.abs(joyZ) > 0.1 && joyY < 0.2)				 // If Joy Z input is greater than the deadzone (0.2),
 		{										 // make tracks turn at  different speeds
 			if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )  // This if statement and the following one both make sure that the
 			{											   // input reaching the drive method never goes above 1
-				trackLeft = trackLeft - joyZ;
+				trackLeft = 0;
+				trackLeft = trackLeft + joyZ;
 			}
 			if(Math.abs(trackRight) + Math.abs(joyZ) < 1 )
 			{
-				trackRight = trackRight + joyZ;
+				trackRight = 0;
+				trackRight = trackRight - joyZ;
 			}
 		}
+		if(Math.abs(joyY) < 0.2 && Math.abs(joyZ) < 0.1)
+		{
+			trackLeft = 0;
+			trackRight = 0;
+		}
+		System.out.println( "trackLeft: " + trackLeft);
+		System.out.println( "trackRight: " + trackRight);
 		drive.tankDrive(trackLeft, trackRight);   // Sends the final trackLeft/Right variables to the drive method
 	}
 
@@ -211,17 +234,10 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testPeriodic() 
 	{
-		long t= System.currentTimeMillis();
-		long end = t+15000;
-		while(System.currentTimeMillis() < end) 
-		{
-			int obama = 0;
-			while(true){
-				System.out.println(obama);
-				obama++;
-			}
-		}
+		System.out.println( "JoyY: " + joyY);
+		System.out.println( "JoyZ: " + joyZ);
 	}                   
+}
 
                                                   /*:-                          
                                                  /hdms                          
