@@ -4,12 +4,12 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
- 
-//New package, old package was "org.usfirst.frc.team2773.robot;"
-package frc.robot; 
 
-//Imports
-import edu.wpi.first.wpilibj.TimedRobot; 
+//package org.usfirst.frc.team2773.robot;
+
+package frc.robot;
+
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -33,29 +33,26 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  * project.
  */
 public class Robot extends TimedRobot {
-
-	//Declaring variables
 	public static final String kDefaultAuto = "Default";
 	public static final String kCustomAuto = "My Auto";
 	public String m_autoSelected;
 	public SendableChooser<String> m_chooser = new SendableChooser<>();
 	public SendableChooser<String> path = new SendableChooser<>();
 	
-	//Joystick variables
 	public Joystick joy;
 	public Joystick joy2;
 	
-	//Joystick input variables
 	public double joyY;
 	public double joyZ;
-
-	//Drive method variables
 	public double accel;
 	public double veloY;
 	public double veloZ;
 	public double maxSpeed;
+
+	public double staticTurn;
+	public double trackLeft;
+	public double trackRight;
 	
-	//Motors and motor controller variables
 	public Victor FL; //Finnifan_Leftson
 	public Victor BL; //Benjamen Leftson
 	public SpeedControllerGroup left;
@@ -64,27 +61,25 @@ public class Robot extends TimedRobot {
 	public SpeedControllerGroup right;
 	public DifferentialDrive drive;
 	
-	//Grabber? (looks scuffed right now)
-	public Spark Grabber; //Happy Time
-	//public Spark GL; //Turny Turn
+	//Grabber 
+	public Spark grabber; //Happy Time
+	//public Spark GL; //Turny Turn 
 
-	public Spark lift; 
+	public Spark pole;
+	public Spark grabLift;
 
-	//Solenoids and compressor variables
 	DoubleSolenoid solenoid1; 
-	Solenoid solenoid2;
+	Solenoid solenoidMain;
 	Solenoid solenoid3;
-	Compressor comp;
+	//Compressor comp;
 	
-	//Autonomous code variable
 	public String startChar;
-
-	//Timer variable
 	public Timer timer;
 	
-	//Camera variables
 	public CameraServer camera;
 
+	public boolean[] joyVals;
+	public boolean[] joy2Vals;
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -106,9 +101,8 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putData("Path Choices", path);
 		outputValues();
 
-		//Declaring and assigning default variables
-		joy = new Joystick(1); 
-		joy2 = new Joystick(2);
+		joy = new Joystick(1); //Declaring and assigning default variables
+		joy2 = new Joystick(3);
 		joyY = 0;
 		joyZ = 0;
 		
@@ -116,7 +110,6 @@ public class Robot extends TimedRobot {
 		veloY = 0;
 		veloZ = 0;
 		maxSpeed = 0.4;
-
 		FL = new Victor(0);
 		FR = new Victor(3);
 		BL = new Victor(1);
@@ -126,16 +119,25 @@ public class Robot extends TimedRobot {
 		right = new SpeedControllerGroup(FR, BR);
 		
 		drive = new DifferentialDrive(left, right);
+
 		
-		Grabber = new Spark(4);
+		staticTurn = 2;
+		trackLeft = 0;
+		trackRight = 0;
+		
+		grabber = new Spark(4);
+		grabber.setInverted(true);
 		//GL = new Spark(5);
 
-		lift = new Spark(6); //placeholder value
+		pole = new Spark(7);
+		pole.setInverted(true);
+		grabLift = new Spark(6);
+		grabLift.setInverted(true);
 
 		//solenoid1 = new DoubleSolenoid(0, 1);
-		solenoid2 = new Solenoid(4);
+		solenoidMain = new Solenoid(0);
 		//solenoid3 = new Solenoid(3);
-		comp = new Compressor(0);
+		//comp = new Compressor();
 		//comp.start();
 		
 		startChar = "A";
@@ -144,6 +146,9 @@ public class Robot extends TimedRobot {
 		camera = CameraServer.getInstance();
 		camera.startAutomaticCapture(0).setResolution(1280, 720);
 		//camera.setFPS(15);
+
+		joyVals = new boolean[12];
+		joy2Vals = new boolean[10];
 		
 	}
 
@@ -171,10 +176,8 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 
-	public void autonomousPeriodic() 
-	{ 
-		//All autonomous codes
-		if(startChar == "FR1")
+	public void autonomousPeriodic() { //all autonomous names
+			if(startChar == "FR1")
 			{
 				close(0, 1);
 			}
@@ -214,7 +217,7 @@ public class Robot extends TimedRobot {
 			{
 				middle(-1);
 			}
-	} 
+		} 
 	
 
 
@@ -286,86 +289,136 @@ public class Robot extends TimedRobot {
 	{
 		drive(-joy.getY(), joy.getZ());
 		grab();
+		lift();
+		checkAllInputs();
 		//outputValues();
+		toggleSolenoid();
+		System.out.println(joy2.getRawAxis(1));
 	}
 	
-	//The drive method, takes input from Joystick(1) and passes to drive.tankDrive
-	public void drive(double joyY, double joyZ)
+	public void drive(double joyY, double joyZ)  // takes input from joystick to control robot drivetrain (treads).
 	{
-
-		// Updates variables from Joystick
-		//maxSpeed = joy.getThrottle();
-		
-		/*if(Math.abs(joyY) > 0.2 && Math.abs(veloY) < maxSpeed) // If the joystick is being moved and the robot is below max speed, accelerate
-			veloY += 0.2 * joyY * accel;
-		else if(Math.abs(joyY) <= 0.2 && Math.abs(veloY) > 0.2) // Joystick is resting, robot is still moving, then negative accelertaion
-			veloY -= 0.4 * accel * -veloY;
-		else // If no movement, sets to zero
-			veloY = 0; 
-		
-		if(veloY >= maxSpeed) // Makes sures doesn't exceed max speed
-			veloY = maxSpeed; */
-
-		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
-			drive.tankDrive(joyY, joyY);
-		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)
-			drive.tankDrive(joyZ * 0.8, -joyZ * 0.8);
-		else // If no input, no movement
-			drive.tankDrive(0, 0); 
-		System.out.println(joyY);
-		System.out.println(joyZ);
-		/*if(joyY > 0.2)
-			drive.tankDrive(joyY, joyY);*/
+		joyZ = joyZ * 0.5;
+		System.out.println( "JoyY: " + joyY);
+		System.out.println( "JoyZ: " + joyZ);
+		if(Math.abs(joyY) > 0.2)                 // If Joy Y input is greater than the deadzone (0.2), add forward velocity.
+		{
+			trackLeft = joyY;
+			trackRight = joyY;
+			if(Math.abs(joyZ) > 0.1 )				 // If Joy Z input is greater than the deadzone (0.2),
+			{										 // make tracks turn at  different speeds
+				//if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )  // This if statement and the following one both make sure that the
+				//{											   // input reaching the drive method never goes above 1
+					trackLeft = trackLeft + joyZ;
+				//}
+				//if(Math.abs(trackRight) + Math.abs(joyZ) < 1 )
+				//{
+					trackRight = trackRight - joyZ;
+				//}
+			}
+		}
+		else if(Math.abs(joyZ) > 0.1 && joyY < 0.2)				 // If Joy Z input is greater than the deadzone (0.2),
+		{										 // make tracks turn at  different speeds
+			if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )  // This if statement and the following one both make sure that the
+			{											   // input reaching the drive method never goes above 1
+				trackLeft = 0;
+				trackLeft = trackLeft + joyZ * staticTurn;
+			}
+			if(Math.abs(trackRight) + Math.abs(joyZ) < 1 )
+			{
+				trackRight = 0;
+				trackRight = trackRight - joyZ * staticTurn;
+			}
+		}
+		if(Math.abs(joyY) < 0.2 && Math.abs(joyZ) < 0.1)
+		{
+			trackLeft = 0;
+			trackRight = 0;
+		}
+		System.out.println( "trackLeft: " + trackLeft);
+		System.out.println( "trackRight: " + trackRight);
+		drive.tankDrive(trackLeft * .95, trackRight);   // Sends the final trackLeft/Right variables to the drive method. trackLeft is adjusted for slight hardware difference
 	}
 	
-	//The grabber method, gets button presses from Joystick(1) and controls the motors on the grabber.
-	public void grab()
+	public void grab() //method for controling robot grabber
 	{
 		if(joy.getRawButton(1)) 
 		{
-			Grabber.set(-0.5);
-			//GL.set(-0.5);
+			grabber.set(1);
 		}
 		else if(joy.getRawButton(2))
 		{
-			Grabber.set(-1);
-			//GL.set(0.5);
+			grabber.set(-1);
 		} 
 		else
 		{
-			Grabber.set(0);
+			grabber.set(0);
 			//GL.set(0);
 		}
 	}
 
-	//The lifter method, gets button presses from Joystick(1) and controls the motors on the lifter.
 	public void lift()
 	{
-		if(joy.getRawButton(12))
+		//Brings pole up
+		if(joy2.getRawAxis(5) < -0.2)
 		{
-			lift.set(0.5);
+			pole.set(1);
+			grabLift.set(-0.6);
 		}
-		else if(joy.getRawButton(11))
+		//Brings both down
+		else if(joy2.getRawAxis(5) > 0.2)
 		{
-			lift.set(-0.5);
+			pole.set(-1);
+			grabLift.set(0.5);
 		}
-		else
+		//Brings grabber up
+		else if(joy2.getRawAxis(1) < -0.2)
 		{
-			lift.set(0);
+			//pole.set(1);
+			grabLift.set(1);
+		}
+
+		//Grabber down
+		else if(joy2.getRawAxis(1) > 0.2)
+		{
+			//pole.set(-1);
+			grabLift.set(-1);
+		}
+		else{
+			pole.set(0);
+			grabLift.set(0);
+		}
+	}
+
+	public void toggleSolenoid(){
+		if(joy2.getRawButton(1)){
+			System.out.println(solenoidMain.get());
+;			solenoidMain.set(!solenoidMain.get());
 		}
 	}
 	
-	//This method outputs values for use by SmartDashboard
+	public void checkAllInputs()
+	{
+		for(int i = 0; i < 12; i++)
+		{
+			joyVals[i] = joy.getRawButton(i + 1);
+		}
+		for(int i = 0; i < 10; i++)
+		{
+			joy2Vals[i] = joy2.getRawButton(i + 1);
+		}
+	}
+	
 	public void outputValues()
 	{
-		SmartDashboard.putNumber("Test", Math.PI);
-		SmartDashboard.putNumber("Time", 999);
-		SmartDashboard.putNumber("Left", 999);
-		SmartDashboard.putNumber("Right", 999);
-
+		SmartDashboard.putNumber("Match", Timer.getMatchTime());
+		SmartDashboard.putNumber("JoyX", joy.getX());
+		SmartDashboard.putNumber("JoyY", joy.getY());
+		SmartDashboard.putNumber("JoyZ", joy.getZ());
+		SmartDashboard.putBooleanArray("Joystick Values", joyVals);
+		SmartDashboard.putBooleanArray("Joystick 2 Values", joy2Vals);
 	}
 
-//==================================Beware traveller! Know that beyond this point lies the testing methods!==================================
 
 	@Override
 	public void testInit() {
@@ -377,24 +430,24 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void testPeriodic() {
-		//System.out.println(stick.getRawButton(1));
+		System.out.println(joy.getRawButton(1));
 		if (joy.getRawButton(1)) {
 			//System.out.println("Button Pressed");
 			//solenoid1.set(DoubleSolenoid.Value.kReverse);
 			//solenoid1.set(DoubleSolenoid.Value.kReverse);
 			//solenoid1.set(DoubleSolenoid.Value.kOff);
-			solenoid2.set(true);
+			//solenoid2.set(true);
 			//solenoid3.set(true);
 			} else {
 				//System.out.println("Button Not Pressed");
 				//solenoid1.set(DoubleSolenoid.Value.kForward);
 				//solenoid1.set(DoubleSolenoid.Value.kOff);
-				solenoid2.set(false);
+				//solenoid2.set(false);
 				//solenoid3.set(false);	
 			}
-			comp.setClosedLoopControl(true);
-			comp.start();
-			System.out.println(comp.enabled());
+			//comp.setClosedLoopControl(true);
+			//comp.start();
+			//System.out.print(comp.enabled() + " : ");
 			//System.out.println(comp.getClosedLoopControl());
 			//System.out.println(comp.getCompressorCurrent());
 			/*System.out.println(comp.getCompressorCurrentTooHighFault());
@@ -403,8 +456,12 @@ public class Robot extends TimedRobot {
 			System.out.println(comp.getCompressorNotConnectedStickyFault());
 			System.out.println(comp.getCompressorShortedFault());
 			System.out.println(comp.getCompressorShortedStickyFault());*/
-			
-	}
+			System.out.println("YOoooooooooo");
+			System.out.println(joy2.getRawAxis(0));
+			System.out.println(joy2.getRawAxis(1));
+			System.out.println(joy2.getRawAxis(2));
+			System.out.println(joy2.getRawAxis(3));
+	} 
 
 	@Override
 	public void disabledInit() {
@@ -417,9 +474,11 @@ public class Robot extends TimedRobot {
 		System.out.println("no idea: " +
 				getClass().getClassLoader().getResource("").getPath());*/
 	}
-}                   
+} 
 
-                                                  /*:                          
+
+
+                                                  /*:-                          
                                                  /hdms                          
                                                 `ommmh.                          
                                                `+mmmd/os+-`                      
@@ -433,9 +492,9 @@ public class Robot extends TimedRobot {
     `odmmdhshmmmmmthemmmmmmmmmd/     `+shys/      odmmmmdy+-` ``                   
    `ymmmmmkhaimmmmmrealmmmmm:.      `hhailmmy      `-omm-                          
    smsocksmismmmmmmmmvpmmmmm        :mmthemmm`       -mm:                          
-  `mmmmmmmmmbadmmmmmmmmmmmmmyo/`     ommorbd/     `/oymd.                          
-  -mmmsquidmmmmmmmmmmmmyommmmmms      `:+/:`     `dmds+.                           
-  `dmmmtastesmmmmmmmd/`hmmmmmd:                  smm/                             
+  `mmmmmmmmmbadmcoltermmmmmmyo/`     ommorbd/     `/oymd.                          
+  -mmmsquidmmmmmwasmmmmyommmmmms      `:+/:`     `dmds+.                           
+  `dmmmtastesmmheremd/`hmmmmmd:                  smm/                             
    ommmmmmgoodmmmmmdo` `oydmmmh-   ``        ``   /mmo                             
    :malecmmmmmmmmdo.     ``-+syhsohddh-    +hddy+hmd+`                             
    :mmisn'tmmmmd+.            ``.-:+hmy-.-:md+oyyy+`                               
