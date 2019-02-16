@@ -286,7 +286,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic()
 	{
-		int test = 999;
+		int test = 9828;
 		drive(-joy.getY(), joy.getZ());
 		grab();
 		lift();
