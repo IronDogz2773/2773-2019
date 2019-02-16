@@ -185,7 +185,7 @@ public class Robot extends TimedRobot {
 		}
 		else if(startChar == "BR1")
 		{
-			close(48, 1);
+			close(4, 1);
 		}
 		else if(startChar == "FL2")
 		{
@@ -278,6 +278,20 @@ public void turn45(int direction) { // turning 45 degrees
 	timer.reset();
 	drive.tankDrive(0, 0);
 }
+public void driveForward1Inch(int inch) 
+{
+	for(int i = 0; i < inch; i++)
+	{
+		timer.reset();
+		timer.start();
+		if(timer.get() < 0.66) //time it takes to drive one inch
+			drive.tankDrive(0.8, 0.8);
+		//250 is a placeholder value for how long it takes to drive one inch
+		timer.stop();
+		timer.reset();
+	}
+	drive.tankDrive(0, 0);
+}
 
 public void turn90(int direction) { // turning 90 degrees
 	timer.reset();
@@ -290,6 +304,7 @@ public void turn90(int direction) { // turning 90 degrees
 }
 
 public void middle(int turn) {
+	driveForward1(back);
 	driveForward3(3);
 	driveForward1(1);
 	turn45(1);
@@ -298,17 +313,19 @@ public void middle(int turn) {
 	turn45(-1);
 	driveForward3(2);
 	driveForward1(1);
-	driveForward3Inch()
+	driveForward3Inch(2)
 	turn90(-1);
-	driveForward(2);
-	driveForward2(1);
+	driveForward1(2);
+	driveForward3Inch(1);
 }
 
 public void far(int back, int turn) {
-	driveForward(6 + back);
-	driveForward2(3);
+	driveForward3(2);
+	driveForward3Inch(1);
+	driveForward1Inch(1);
 	turn90(1);
-	driveForward(3);
+	driveForward3(1);
+	driveForward3Inch(3);
 	turn45(-1);
 	turn45(-1);
 	turn45(-1);
