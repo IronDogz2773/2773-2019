@@ -150,6 +150,7 @@ public class Robot extends TimedRobot {
 
 		joyVals = new boolean[12];
 		joy2Vals = new boolean[10];
+
 		
 	}
 
@@ -410,7 +411,6 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putBooleanArray("Joystick Values", joyVals);
 		SmartDashboard.putBooleanArray("Joystick 2 Values", joy2Vals);
 	}
-
 
 	@Override
 	public void testInit() {
