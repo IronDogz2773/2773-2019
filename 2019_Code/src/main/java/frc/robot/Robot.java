@@ -179,109 +179,163 @@ public class Robot extends TimedRobot {
 	@Override
 
 	public void autonomousPeriodic() { //all autonomous names
-			if(startChar == "FR1")
-			{
-				close(0, 1);
-			}
-			else if(startChar == "BR1")
-			{
-				close(48, 1);
-			}
-			else if(startChar == "FL2")
-			{
-				close(0, -1);
-			}
-			else if(startChar == "BL2")
-			{
-				close(48, -1);
-			}
-			else if(startChar == "FR2")
-			{
-				far(0, 1);
-			}
-			else if(startChar == "BR2")
-			{
-				far(48, 1);
-			}
-			else if(startChar == "FL1")
-			{
-				far(0, -1);
-			}
-			else if(startChar == "BL1")
-			{
-				far(48, -1);
-			}
-			else if(startChar == "FM2")
-			{
-				middle(1);
-			}
-			else if(startChar == "FM1")
-			{
-				middle(-1);
-			}
-		} 
-	
-
-
-	public void driveForward(int inches) 
-	{
-		for(int i = 0; i < inches; i++)
+		if(startChar == "FR1")
 		{
-			if(timer.get() < 250) //time it takes to drive one inch
-				drive.tankDrive(1, 1);
-			 //250 is a placeholder value for how long it takes to drive one inch
+			close(0, 1);
 		}
-		drive.tankDrive(0, 0);
-	}
-	public void turn45(int direction) //turning 45 degrees
+		else if(startChar == "BR1")
+		{
+			close(48, 1);
+		}
+		else if(startChar == "FL2")
+		{
+			close(0, -1);
+		}
+		else if(startChar == "BL2")
+		{
+			close(48, -1);
+		}
+		else if(startChar == "FR2")
+		{
+			far(0, 1);
+		}
+		else if(startChar == "BR2")
+		{
+			far(48, 1);
+		}
+		else if(startChar == "FL1")
+		{
+			far(0, -1);
+		}
+		else if(startChar == "BL1")
+		{
+			far(48, -1);
+		}
+		else if(startChar == "FM2")
+		{
+			middle(1);
+		}
+		else if(startChar == "FM1")
+		{
+			middle(-1);
+		}
+	} 
+
+public void toggleSolenoid(){
+	if(joy.getRawButton(5)){}
+	//	solenoidMain.set(!solenoidMain.get());
+}
+
+
+public void driveForward1(int feet) 
+{
+	for(int i = 0; i < feet; i++)
 	{
+		timer.reset();
+		timer.start();
+		if(timer.get() < 0.66) //time it takes to drive one inch
+			drive.tankDrive(0.8, 0.8);
+		//250 is a placeholder value for how long it takes to drive one inch
+		timer.stop();
+		timer.reset();
+	}
+	drive.tankDrive(0, 0);
+}
+public void driveForward3(int feet) 
+{
+	for(int i = 0; i < 3 * feet; i++)
+	{
+		timer.reset();
+		timer.start();
+		if(timer.get() < 0.66) //time it takes to drive one inch
+			drive.tankDrive(0.8, 0.8);
+		//250 is a placeholder value for how long it takes to drive one inch
+		timer.stop();
+		timer.reset();
+	}
+	drive.tankDrive(0, 0);
+}
+public void driveForward3Inch(int inch) 
+{
+	for(int i = 0; i < 3 * inch; i++)
+	{
+		timer.reset();
+		timer.start();
+		if(timer.get() < 0.66) //time it takes to drive one inch
+			drive.tankDrive(0.8, 0.8);
+		//250 is a placeholder value for how long it takes to drive one inch
+		timer.stop();
+		timer.reset();
+	}
+	drive.tankDrive(0, 0);
+}
+public void turn45(int direction) { // turning 45 degrees
+	timer.reset();
+	timer.start();
+	while (timer.get() < 45)
 		drive.tankDrive(-1 * direction, 1 * direction);
-		//wait(250);
-		drive.tankDrive(0, 0);
-	}
-	public void turn90(int direction) { //turning 90 degrees
-		
+	timer.stop();
+	timer.reset();
+	drive.tankDrive(0, 0);
+}
+
+public void turn90(int direction) { // turning 90 degrees
+	timer.reset();
+	timer.start();
+	while (timer.get() < 90)
 		drive.tankDrive(-1 * direction, 1 * direction);
-		//wait(250);
-		drive.tankDrive(0, 0);
-	}
-	public void middle(int turn) 
-	{
-		driveForward(81);
-		turn45(1);
-		driveForward(105);
-		turn45(-1);
-		driveForward(90);
-		turn90(-1);
-		driveForward(27);
-	}
-	public void far(int back, int turn)
-	{
-		driveForward(81 + back);
-		turn90(1);
-		driveForward(45);
-		turn45(-1);
-		turn45(-1);
-		turn45(-1);
-		driveForward(105);
-		turn45(-1);
-		driveForward(90);
-		turn90(-1);
-		driveForward(27);
-		//smash into cargo ship
-	}
-	public void close(int back, int turn)
-	{
-		driveForward(120 + back);
-		turn45(-1);
-		driveForward(48);
-		turn45(1);
-		driveForward(90);
-		turn90(1);
-		driveForward(27);
-		//smash into cargo ship
-		
-	}
+	timer.stop();
+	timer.reset();                  
+	drive.tankDrive(0, 0);
+}
+
+public void middle(int turn) {
+	driveForward3(3);
+	driveForward1(1);
+	turn45(1);
+	driveForward3(1);
+	driveForward1(1);
+	turn45(-1);
+	driveForward3(2);
+	driveForward1(1);
+	driveForward3Inch()
+	turn90(-1);
+	driveForward(2);
+	driveForward2(1);
+}
+
+public void far(int back, int turn) {
+	driveForward(6 + back);
+	driveForward2(3);
+	turn90(1);
+	driveForward(3);
+	turn45(-1);
+	turn45(-1);
+	turn45(-1);
+	driveForward(8);
+	driveForward2(3);
+	turn45(-1);
+	driveForward(7);
+	driveForward2(2);
+	turn90(-1);
+	driveForward(2);
+	driveForward2(1);
+	// smash into cargo ship
+}
+
+public void close(int back, int turn) {
+	driveForward(10 + back);
+	turn45(-1);
+	driveForward(4);
+	turn45(1);
+	driveForward(7);
+	driveForward2(2);
+	turn90(1);
+	driveForward(2);
+	driveForward2(1);
+	// smash into cargo ship
+
+}
 	
 	/**
 	 * This function is called periodically during operator control.
