@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
 	public Spark grabLift;
 
 	DoubleSolenoid solenoid1; 
-	Solenoid solenoid2;
+	Solenoid solenoidMain;
 	Solenoid solenoid3;
 	//Compressor comp;
 	
@@ -136,7 +136,7 @@ public class Robot extends TimedRobot {
 		grabLift.setInverted(true);
 
 		//solenoid1 = new DoubleSolenoid(0, 1);
-		solenoid2 = new Solenoid(0);
+		solenoidMain = new Solenoid(0);
 		//solenoid3 = new Solenoid(3);
 		//comp = new Compressor();
 		//comp.start();
@@ -150,7 +150,6 @@ public class Robot extends TimedRobot {
 
 		joyVals = new boolean[12];
 		joy2Vals = new boolean[10];
-
 		
 	}
 
@@ -292,7 +291,9 @@ public class Robot extends TimedRobot {
 		drive(-joy.getY(), joy.getZ());
 		grab();
 		lift();
-		//outputValues();
+		checkAllInputs();
+		outputValues();
+		toggleSolenoid();
 		System.out.println(joy2.getRawAxis(1));
 	}
 	
@@ -337,7 +338,7 @@ public class Robot extends TimedRobot {
 		}
 		System.out.println( "trackLeft: " + trackLeft);
 		System.out.println( "trackRight: " + trackRight);
-		drive.tankDrive(trackLeft, trackRight);   // Sends the final trackLeft/Right variables to the drive method
+		drive.tankDrive(trackLeft * .95, trackRight);   // Sends the final trackLeft/Right variables to the drive method. trackLeft is adjusted for slight hardware difference
 	}
 	
 	public void grab() //method for controling robot grabber
@@ -389,8 +390,13 @@ public class Robot extends TimedRobot {
 			grabLift.set(0);
 		}
 	}
+
+	public void toggleSolenoid(){
+		if(joy2.getRawButton(1))
+			solenoidMain.set(!solenoidMain.get());
+	}
 	
-	public void allInputs()
+	public void checkAllInputs()
 	{
 		for(int i = 0; i < 12; i++)
 		{
@@ -411,6 +417,7 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putBooleanArray("Joystick Values", joyVals);
 		SmartDashboard.putBooleanArray("Joystick 2 Values", joy2Vals);
 	}
+
 
 	@Override
 	public void testInit() {
