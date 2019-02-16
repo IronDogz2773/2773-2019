@@ -15,15 +15,14 @@ import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.Compressor;
+//import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -86,8 +85,8 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		m_chooser.addDefault("Default Auto", kDefaultAuto);
-		m_chooser.addObject("My Auto", kCustomAuto);
+		//m_chooser.addDefault("Default Auto", kDefaultAuto);
+		//m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
 		
 		path.setDefaultOption("FR1", "FR1");
@@ -393,31 +392,34 @@ public class Robot extends TimedRobot {
 
 	public void toggleSolenoid(){
 		if(joy2.getRawButton(1)){
-			System.out.println(solenoidMain.get());
-;			solenoidMain.set(!solenoidMain.get());
+			solenoidMain.set(true);
+		}
+		else if(!joy2.getRawButton(1)){
+			solenoidMain.set(false);
 		}
 	}
 	
 	public void checkAllInputs()
 	{
-		for(int i = 0; i < 12; i++)
+		/*for(int i = 0; i < 12; i++)
 		{
 			joyVals[i] = joy.getRawButton(i + 1);
 		}
 		for(int i = 0; i < 10; i++)
 		{
 			joy2Vals[i] = joy2.getRawButton(i + 1);
-		}
+		}*/
 	}
 	
 	public void outputValues()
 	{
-		SmartDashboard.putNumber("Match", Timer.getMatchTime());
-		SmartDashboard.putNumber("JoyX", joy.getX());
-		SmartDashboard.putNumber("JoyY", joy.getY());
-		SmartDashboard.putNumber("JoyZ", joy.getZ());
-		SmartDashboard.putBooleanArray("Joystick Values", joyVals);
-		SmartDashboard.putBooleanArray("Joystick 2 Values", joy2Vals);
+		//TODO Dashboard machine broke
+		//SmartDashboard.putNumber("Match", Timer.getMatchTime());
+		//SmartDashboard.putNumber("JoyX", joy.getX());
+		//SmartDashboard.putNumber("JoyY", joy.getY());
+		//SmartDashboard.putNumber("JoyZ", joy.getZ());
+		//SmartDashboard.putBooleanArray("Joystick Values", joyVals);
+		//SmartDashboard.putBooleanArray("Joystick 2 Values", joy2Vals);
 	}
 
 
