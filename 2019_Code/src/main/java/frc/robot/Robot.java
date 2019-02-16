@@ -100,7 +100,7 @@ public class Robot extends TimedRobot {
 		outputValues();
 
 		joy = new Joystick(1); //Declaring and assigning default variables
-		joy2 = new Joystick(2);
+		joy2 = new Joystick(3);
 		joyY = 0;
 		joyZ = 0;
 		
@@ -287,6 +287,7 @@ public class Robot extends TimedRobot {
 		grab();
 		lift();
 		//outputValues();
+		System.out.println(joy2.getRawAxis(1));
 	}
 	
 	public void drive(double joyY, double joyZ)  // takes input from joystick to control robot drivetrain (treads).
@@ -353,29 +354,29 @@ public class Robot extends TimedRobot {
 	public void lift()
 	{
 		//Brings pole up
-		if(joy.getRawButton(12))
+		if(joy2.getRawAxis(5) < -0.2)
 		{
 			pole.set(1);
 			grabLift.set(-0.6);
 		}
 		//Brings both down
-		else if(joy.getRawButton(11))
+		else if(joy2.getRawAxis(5) > 0.2)
 		{
 			pole.set(-1);
-			grabLift.set(-1);
+			grabLift.set(0.5);
 		}
 		//Brings grabber up
-		else if(joy.getRawButton(10))
+		else if(joy2.getRawAxis(1) < -0.2)
 		{
 			//pole.set(1);
 			grabLift.set(1);
 		}
 
-		//Brings pole down and gives slack from grabber
-		else if(joy.getRawButton(9))
+		//Grabber down
+		else if(joy2.getRawAxis(1) > 0.2)
 		{
-			pole.set(-1);
-			grabLift.set(-0.6);
+			//pole.set(-1);
+			grabLift.set(-1);
 		}
 		else{
 			pole.set(0);
@@ -402,7 +403,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void testPeriodic() {
-		//System.out.println(stick.getRawButton(1));
+		System.out.println(joy.getRawButton(1));
 		if (joy.getRawButton(1)) {
 			//System.out.println("Button Pressed");
 			//solenoid1.set(DoubleSolenoid.Value.kReverse);
@@ -428,6 +429,11 @@ public class Robot extends TimedRobot {
 			System.out.println(comp.getCompressorNotConnectedStickyFault());
 			System.out.println(comp.getCompressorShortedFault());
 			System.out.println(comp.getCompressorShortedStickyFault());*/
+			System.out.println("YOoooooooooo");
+			System.out.println(joy2.getRawAxis(0));
+			System.out.println(joy2.getRawAxis(1));
+			System.out.println(joy2.getRawAxis(2));
+			System.out.println(joy2.getRawAxis(3));
 	} 
 
 	@Override
