@@ -78,6 +78,8 @@ public class Robot extends TimedRobot {
 	
 	public CameraServer camera;
 
+	public boolean[] joyVals;
+	public boolean[] joy2Vals;
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
@@ -145,6 +147,10 @@ public class Robot extends TimedRobot {
 		camera = CameraServer.getInstance();
 		camera.startAutomaticCapture(0).setResolution(1280, 720);
 		//camera.setFPS(15);
+
+		joyVals = new boolean[12];
+		joy2Vals = new boolean[10];
+
 		
 	}
 
@@ -384,13 +390,26 @@ public class Robot extends TimedRobot {
 		}
 	}
 	
+	public void allInputs()
+	{
+		for(int i = 0; i < 12; i++)
+		{
+			joyVals[i] = joy.getRawButton(i + 1);
+		}
+		for(int i = 0; i < 10; i++)
+		{
+			joy2Vals[i] = joy2.getRawButton(i + 1);
+		}
+	}
+	
 	public void outputValues()
 	{
-		SmartDashboard.putNumber("Test", Math.PI);
-		SmartDashboard.putNumber("Time", 999);
-		SmartDashboard.putNumber("Left", 999);
-		SmartDashboard.putNumber("Right", 999);
-
+		SmartDashboard.putNumber("Match", Timer.getMatchTime());
+		SmartDashboard.putNumber("JoyX", joy.getX());
+		SmartDashboard.putNumber("JoyY", joy.getY());
+		SmartDashboard.putNumber("JoyZ", joy.getZ());
+		SmartDashboard.putBooleanArray("Joystick Values", joyVals);
+		SmartDashboard.putBooleanArray("Joystick 2 Values", joy2Vals);
 	}
 
 	@Override
