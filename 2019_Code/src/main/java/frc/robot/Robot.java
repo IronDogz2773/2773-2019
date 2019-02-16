@@ -15,7 +15,10 @@ import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Spark;
@@ -45,6 +48,10 @@ public class Robot extends TimedRobot {
 	public double veloY;
 	public double veloZ;
 	public double maxSpeed;
+
+	public double staticTurn;
+	public double trackLeft;
+	public double trackRight;
 	
 	public Victor FL; //Finnifan_Leftson
 	public Victor BL; //Benjamen Leftson
@@ -55,25 +62,30 @@ public class Robot extends TimedRobot {
 	public DifferentialDrive drive;
 	
 	//Grabber 
-	public Spark Grabber; //Happy Time
-	//public Spark GL; //Turny Turn
+	public Spark grabber; //Happy Time
+	//public Spark GL; //Turny Turn 
+
+	public Spark pole;
+	public Spark grabLift;
+
+	DoubleSolenoid solenoid1; 
+	Solenoid solenoid2;
+	Solenoid solenoid3;
+	//Compressor comp;
 	
 	public String startChar;
-	public static Timer timer;
+	public Timer timer;
 	
 	public CameraServer camera;
 
 	public boolean[] joyVals;
 	public boolean[] joy2Vals;
-
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
 	@Override
 	public void robotInit() {
-		timer.start();
-
 		m_chooser.addDefault("Default Auto", kDefaultAuto);
 		m_chooser.addObject("My Auto", kCustomAuto);
 		SmartDashboard.putData("Auto choices", m_chooser);
@@ -90,7 +102,7 @@ public class Robot extends TimedRobot {
 		outputValues();
 
 		joy = new Joystick(1); //Declaring and assigning default variables
-		joy2 = new Joystick(2);
+		joy2 = new Joystick(3);
 		joyY = 0;
 		joyZ = 0;
 		
@@ -108,10 +120,26 @@ public class Robot extends TimedRobot {
 		right = new SpeedControllerGroup(FR, BR);
 		
 		drive = new DifferentialDrive(left, right);
+
 		
-		//grabber = new Spark(4);
-		//grabber.setInverted(true);
+		staticTurn = 2;
+		trackLeft = 0;
+		trackRight = 0;
+		
+		grabber = new Spark(4);
+		grabber.setInverted(true);
 		//GL = new Spark(5);
+
+		pole = new Spark(7);
+		pole.setInverted(true);
+		grabLift = new Spark(6);
+		grabLift.setInverted(true);
+
+		//solenoid1 = new DoubleSolenoid(0, 1);
+		solenoid2 = new Solenoid(0);
+		//solenoid3 = new Solenoid(3);
+		//comp = new Compressor();
+		//comp.start();
 		
 		startChar = "A";
 		timer = new Timer();
@@ -192,16 +220,13 @@ public class Robot extends TimedRobot {
 			}
 		} 
 	
-	public void toggleSolenoid(){
-		if(joy.getRawButton(5)){}
-		//	solenoidMain.set(!solenoidMain.get());
-	}
+
 
 	public void driveForward(int inches) 
 	{
 		for(int i = 0; i < inches; i++)
 		{
-			if(timer.get() < 1) //time it takes to drive one inch
+			if(timer.get() < 250) //time it takes to drive one inch
 				drive.tankDrive(1, 1);
 			 //250 is a placeholder value for how long it takes to drive one inch
 		}
@@ -265,57 +290,105 @@ public class Robot extends TimedRobot {
 	{
 		drive(-joy.getY(), joy.getZ());
 		grab();
-		// lift();
+		lift();
 		//outputValues();
+		System.out.println(joy2.getRawAxis(1));
 	}
 	
-	// Gets input from contoller and moves robot 
-	public void drive(double joyY, double joyZ)
+	public void drive(double joyY, double joyZ)  // takes input from joystick to control robot drivetrain (treads).
 	{
-
-		// Updates variables from Joystick
-		//maxSpeed = joy.getThrottle();
-		
-		/*if(Math.abs(joyY) > 0.2 && Math.abs(veloY) < maxSpeed) // If the joystick is being moved and the robot is below max speed, accelerate
-			veloY += 0.2 * joyY * accel;
-		else if(Math.abs(joyY) <= 0.2 && Math.abs(veloY) > 0.2) // Joystick is resting, robot is still moving, then negative accelertaion
-			veloY -= 0.4 * accel * -veloY;
-		else // If no movement, sets to zero
-			veloY = 0; 
-		
-		if(veloY >= maxSpeed) // Makes sures doesn't exceed max speed
-			veloY = maxSpeed; */
-
-		if(Math.abs(joyY) > 0.2) // Controls Y axis movement (forwards/backwards)
-			drive.tankDrive(joyY, joyY);
-		else if(Math.abs(joyZ) > 0.1) // Controls Z axis movement (turning)oyY
-			drive.tankDrive(joyZ * 0.6, -joyZ * 0.6);
-		else // If no input, no movement
-			drive.tankDrive(0, 0); 
-		System.out.println(joyY);
-		System.out.println(joyZ);
-		/*if(joyY > 0.2)
-			drive.tankDrive(joyY, joyY);*/
+		joyZ = joyZ * 0.5;
+		System.out.println( "JoyY: " + joyY);
+		System.out.println( "JoyZ: " + joyZ);
+		if(Math.abs(joyY) > 0.2)                 // If Joy Y input is greater than the deadzone (0.2), add forward velocity.
+		{
+			trackLeft = joyY;
+			trackRight = joyY;
+			if(Math.abs(joyZ) > 0.1 )				 // If Joy Z input is greater than the deadzone (0.2),
+			{										 // make tracks turn at  different speeds
+				//if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )  // This if statement and the following one both make sure that the
+				//{											   // input reaching the drive method never goes above 1
+					trackLeft = trackLeft + joyZ;
+				//}
+				//if(Math.abs(trackRight) + Math.abs(joyZ) < 1 )
+				//{
+					trackRight = trackRight - joyZ;
+				//}
+			}
+		}
+		else if(Math.abs(joyZ) > 0.1 && joyY < 0.2)				 // If Joy Z input is greater than the deadzone (0.2),
+		{										 // make tracks turn at  different speeds
+			if(Math.abs(trackLeft) + Math.abs(joyZ) < 1 )  // This if statement and the following one both make sure that the
+			{											   // input reaching the drive method never goes above 1
+				trackLeft = 0;
+				trackLeft = trackLeft + joyZ * staticTurn;
+			}
+			if(Math.abs(trackRight) + Math.abs(joyZ) < 1 )
+			{
+				trackRight = 0;
+				trackRight = trackRight - joyZ * staticTurn;
+			}
+		}
+		if(Math.abs(joyY) < 0.2 && Math.abs(joyZ) < 0.1)
+		{
+			trackLeft = 0;
+			trackRight = 0;
+		}
+		System.out.println( "trackLeft: " + trackLeft);
+		System.out.println( "trackRight: " + trackRight);
+		drive.tankDrive(trackLeft, trackRight);   // Sends the final trackLeft/Right variables to the drive method
 	}
 	
 	public void grab() //method for controling robot grabber
 	{
 		if(joy.getRawButton(1)) 
 		{
-		//	grabber.set(1);
+			grabber.set(1);
 		}
 		else if(joy.getRawButton(2))
 		{
-			Grabber.set(-1);
-			//GL.set(0.5);
-		}
+			grabber.set(-1);
+		} 
 		else
 		{
-			// rabber.set(0);
+			grabber.set(0);
 			//GL.set(0);
 		}
 	}
 
+	public void lift()
+	{
+		//Brings pole up
+		if(joy2.getRawAxis(5) < -0.2)
+		{
+			pole.set(1);
+			grabLift.set(-0.6);
+		}
+		//Brings both down
+		else if(joy2.getRawAxis(5) > 0.2)
+		{
+			pole.set(-1);
+			grabLift.set(0.5);
+		}
+		//Brings grabber up
+		else if(joy2.getRawAxis(1) < -0.2)
+		{
+			//pole.set(1);
+			grabLift.set(1);
+		}
+
+		//Grabber down
+		else if(joy2.getRawAxis(1) > 0.2)
+		{
+			//pole.set(-1);
+			grabLift.set(-1);
+		}
+		else{
+			pole.set(0);
+			grabLift.set(0);
+		}
+	}
+	
 	public void allInputs()
 	{
 		for(int i = 0; i < 12; i++)
@@ -338,27 +411,66 @@ public class Robot extends TimedRobot {
 		SmartDashboard.putBooleanArray("Joystick 2 Values", joy2Vals);
 	}
 
+
+	@Override
+	public void testInit() {
+		//resetEncoders();
+		//comp.start();
+	}
 	/**
 	 * This function is called periodically during test mode.
 	 */
 	@Override
 	public void testPeriodic() {
-	}
+		System.out.println(joy.getRawButton(1));
+		if (joy.getRawButton(1)) {
+			//System.out.println("Button Pressed");
+			//solenoid1.set(DoubleSolenoid.Value.kReverse);
+			//solenoid1.set(DoubleSolenoid.Value.kReverse);
+			//solenoid1.set(DoubleSolenoid.Value.kOff);
+			//solenoid2.set(true);
+			//solenoid3.set(true);
+			} else {
+				//System.out.println("Button Not Pressed");
+				//solenoid1.set(DoubleSolenoid.Value.kForward);
+				//solenoid1.set(DoubleSolenoid.Value.kOff);
+				//solenoid2.set(false);
+				//solenoid3.set(false);	
+			}
+			//comp.setClosedLoopControl(true);
+			//comp.start();
+			//System.out.print(comp.enabled() + " : ");
+			//System.out.println(comp.getClosedLoopControl());
+			//System.out.println(comp.getCompressorCurrent());
+			/*System.out.println(comp.getCompressorCurrentTooHighFault());
+			System.out.println(comp.getCompressorCurrentTooHighStickyFault());
+			System.out.println(comp.getCompressorNotConnectedFault());
+			System.out.println(comp.getCompressorNotConnectedStickyFault());
+			System.out.println(comp.getCompressorShortedFault());
+			System.out.println(comp.getCompressorShortedStickyFault());*/
+			System.out.println("YOoooooooooo");
+			System.out.println(joy2.getRawAxis(0));
+			System.out.println(joy2.getRawAxis(1));
+			System.out.println(joy2.getRawAxis(2));
+			System.out.println(joy2.getRawAxis(3));
+	} 
 
 	@Override
 	public void disabledInit() {
 
-		System.out.println("Stick X: " + joy.getZ());
+		/*System.out.println("Stick X: " + joy.getZ());
 		System.out.println("Stick Y: " + joy.getY());
 	
 		System.out.println("autonomous target: " + startChar);
 		
 		System.out.println("no idea: " +
-				getClass().getClassLoader().getResource("").getPath());
+				getClass().getClassLoader().getResource("").getPath());*/
 	}
-}                   
+} 
 
-                                                  /*:                          
+
+
+                                                  /*:-                          
                                                  /hdms                          
                                                 `ommmh.                          
                                                `+mmmd/os+-`                      
@@ -372,9 +484,9 @@ public class Robot extends TimedRobot {
     `odmmdhshmmmmmthemmmmmmmmmd/     `+shys/      odmmmmdy+-` ``                   
    `ymmmmmkhaimmmmmrealmmmmm:.      `hhailmmy      `-omm-                          
    smsocksmismmmmmmmmvpmmmmm        :mmthemmm`       -mm:                          
-  `mmmmmmmmmbadmmmmmmmmmmmmmyo/`     ommorbd/     `/oymd.                          
-  -mmmsquidmmmmmmmmmmmmyommmmmms      `:+/:`     `dmds+.                           
-  `dmmmtastesmmmmmmmd/`hmmmmmd:                  smm/                             
+  `mmmmmmmmmbadmcoltermmmmmmyo/`     ommorbd/     `/oymd.                          
+  -mmmsquidmmmmmwasmmmmyommmmmms      `:+/:`     `dmds+.                           
+  `dmmmtastesmmheremd/`hmmmmmd:                  smm/                             
    ommmmmmgoodmmmmmdo` `oydmmmh-   ``        ``   /mmo                             
    :malecmmmmmmmmdo.     ``-+syhsohddh-    +hddy+hmd+`                             
    :mmisn'tmmmmd+.            ``.-:+hmy-.-:md+oyyy+`                               
