@@ -110,7 +110,6 @@ public class Robot extends TimedRobot {
 		veloY = 0;
 		veloZ = 0;
 		maxSpeed = 0.4;
-
 		FL = new Victor(0);
 		FR = new Victor(3);
 		BL = new Victor(1);
@@ -292,7 +291,7 @@ public class Robot extends TimedRobot {
 		grab();
 		lift();
 		checkAllInputs();
-		outputValues();
+		//outputValues();
 		toggleSolenoid();
 		System.out.println(joy2.getRawAxis(1));
 	}
@@ -392,8 +391,10 @@ public class Robot extends TimedRobot {
 	}
 
 	public void toggleSolenoid(){
-		if(joy2.getRawButton(1))
-			solenoidMain.set(!solenoidMain.get());
+		if(joy2.getRawButton(1)){
+			System.out.println(solenoidMain.get());
+;			solenoidMain.set(!solenoidMain.get());
+		}
 	}
 	
 	public void checkAllInputs()
